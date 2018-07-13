@@ -169,3 +169,5 @@ venv.bak/
 ./output_slopes/slopes_dataset_77_nc_14.png
 ./output_slopes/slopes_dataset_8_nc_14.png
 ./output_slopes/slopes_dataset_9_nc_14.png
+output_slopes/
+output_nc13/

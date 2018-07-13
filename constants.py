@@ -15,3 +15,4 @@ detect_nc13_leftovers_interval_frames = 10
 # avg_slope_length_frames = 9  # the length of the slope to look for with a sliding window
 # avg_slope_length_frames
 output_slopes_folder = r".\output_slopes"
+nc13_folder = r".\output_nc13"

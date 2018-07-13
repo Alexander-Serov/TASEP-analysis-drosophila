@@ -14,15 +14,17 @@ else:
 from find_best_fit import find_best_fit
 from identify_shift_and_slope import identify_shift_and_slope
 import numpy as np
+import os
 import pandas as pd
 from reinit_folder import reinit_folder
 from save_series_plot import save_series_plot
 from tqdm import trange
-from constants import matlab_csv_filepath, expected_slope_length_frames, mins_per_frame, output_slopes_folder, detect_nc13_leftovers_interval_frames
+from constants import matlab_csv_filepath, expected_slope_length_frames, mins_per_frame, output_slopes_folder, detect_nc13_leftovers_interval_frames, nc13_folder
 
 
 # %% Initialize
 reinit_folder(output_slopes_folder)
+reinit_folder(nc13_folder)
 
 
 # %% Import
@@ -30,6 +32,91 @@ data = pd.read_csv(matlab_csv_filepath, sep=';')
 print(data.columns.values)
 
 # %% Analyze
+traces_len = data.trace_id.max() + 1
+datasets_len = data.dataset_id.max() + 1
+intersects = np.ones([traces_len, 1]) * np.nan
+slopes = np.ones([traces_len, 1]) * np.nan
+
+# Calculate number of traces overall in each nc
+nc13_total_count, nc14_total_count = [data[data.nc == nc].trace_id.nunique() for nc in[13, 14]]
+print([nc13_total_count, nc14_total_count])
+
+
+# %% nc 13 analysis
+nc = 13
+dataset_id = 8
+for dataset_id in trange(datasets_len):
+    print([dataset_id, nc])
+
+    start_nc13_frame = np.nan
+    end_nc13_frame = np.nan
+    start_nc14_frame = np.nan
+
+    # Select data
+    # dataset = data[data.dataset_id == dataset_id]
+    dataset_nc_data = data[(data.dataset_id == dataset_id) & (data.nc == nc)]
+
+    # If no nc 13, skip
+    if dataset_nc_data.count()[0] == 0:
+        continue
+    dataset_name = dataset_nc_data.dataset.iloc[0]
+    dataset_name
+
+    # Average
+    avg_dataset_nc_data = dataset_nc_data.groupby('Frame').mean()
+    avg_dataset_nc_data
+    start_frame = avg_dataset_nc_data.index.min()
+    end_frame = avg_dataset_nc_data.index.max()
+
+    # Manual corrections
+    if dataset_id == 17:
+        start_frame += 2
+    elif dataset_id == 8:
+        start_frame = 26
+    [start_frame, end_frame]
+
+    # Detect nc13 start frame
+    for start_nc13_frame in range(start_frame, end_frame + 1):
+        if avg_dataset_nc_data[avg_dataset_nc_data.index == start_nc13_frame].count()[0] > 0 and avg_dataset_nc_data[avg_dataset_nc_data.index == start_nc13_frame + 1].count()[0] > 0:
+            break
+    start_nc13_frame
+
+    # Detect the end of the nc 13 by the gap in data
+    for end_nc13_frame in range(start_frame, end_frame + 1):
+        if avg_dataset_nc_data[avg_dataset_nc_data.index == end_nc13_frame].count()[0] == 0 and avg_dataset_nc_data[avg_dataset_nc_data.index < end_nc13_frame].count()[0] > 2:
+            end_nc13_frame -= 1
+            break
+    end_nc13_frame
+
+    # Detect the start of the nc 14 is present by the restart of the data
+
+    for frame in range(end_nc13_frame + 1, end_frame + 1):
+        if avg_dataset_nc_data[avg_dataset_nc_data.index == frame].count()[0] > 0 and avg_dataset_nc_data[avg_dataset_nc_data.index == frame + 1].count()[0] > 0:
+            start_nc14_frame = frame
+            break
+    # Manual corrections
+    if dataset_id == 45:
+        start_nc14_frame += 4
+    elif dataset_id == 50:
+        start_nc14_frame += 6
+    elif dataset_id == 54:
+        start_nc14_frame += 2
+    elif dataset_id == 55:
+        start_nc14_frame += 4
+    elif dataset_id == 74:
+        start_nc14_frame += 2
+    start_nc14_frame
+
+    # Plot
+    fit_interval = [0, 0]  # np.asarray(fit_frames) * mins_per_frame * 0
+    vbars = np.asarray([start_nc13_frame, end_nc13_frame, start_nc14_frame]) * mins_per_frame
+    filename = 'slopes_dataset_%i_nc_%i.png' % (dataset_id, nc)
+    filepath = os.path.join(nc13_folder, filename)
+    save_series_plot(x=avg_dataset_nc_data.time_min,
+                     y=avg_dataset_nc_data.polymerases, a=0, b=0, fit_interval=fit_interval, vbars=vbars, filename=filepath, dataset_name=dataset_name)
+
+
+# %% nc 14 analysis
 analyzed_count = 0
 processed_successfully = 0
 skipped_short_slope = 0
@@ -41,16 +128,6 @@ skipped_discontinuous = 0
 short_trace_lengths = []
 short_slope_lengths = []
 negative_slopes = []
-
-traces_len = data.trace_id.max() + 1
-datasets_len = data.dataset_id.max() + 1
-intersects = np.ones([traces_len, 1]) * np.nan
-slopes = np.ones([traces_len, 1]) * np.nan
-
-# Calculate number of traces overall in each nc
-nc13_total_count, nc14_total_count = [data[data.nc == nc].trace_id.nunique() for nc in[13, 14]]
-print([nc13_total_count, nc14_total_count])
-
 
 for dataset_id in trange(datasets_len):
     # dataset_id = 72
