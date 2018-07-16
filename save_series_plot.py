@@ -9,7 +9,7 @@ import os
 # from constants import output_slopes_folder
 
 
-def save_series_plot(x, y, a, b, fit_interval, vbars, filename, dataset_name):
+def save_series_plot(x, y, a, b, fit_interval, vbars, filename, dataset_name, dataset_id):
     color_list = ['mediumorchid', 'yellowgreen', 'orange']
 
     fig = plt.figure(1)
@@ -32,7 +32,7 @@ def save_series_plot(x, y, a, b, fit_interval, vbars, filename, dataset_name):
         x_bar = [vbar, vbar]
         ax.plot(x_bar, y_bar, color=color_list[i])
 
-    str_title = dataset_name
+    str_title = '%s, id=%i' % (dataset_name, dataset_id)
     # Calculate length
     nc13_length = vbars[1] - vbars[0]
     delta_nc = vbars[2] - vbars[0]

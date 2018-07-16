@@ -6,7 +6,7 @@ import pandas as pd
 from save_series_plot import save_series_plot
 from tqdm import trange
 
-from constants import mins_per_frame, min_nc13_length_minutes, max_nc13_length_minutes, nc13_folder
+from constants import mins_per_frame, min_nc13_length_minutes, max_nc13_length_minutes, nc13_folder, max_reasonable_polymerase_number
 
 
 def identify_ncs(data):
@@ -16,12 +16,14 @@ def identify_ncs(data):
 
     datasets_len = data.dataset_id.max() + 1
     ncs_locations = pd.DataFrame(
-        columns=['nc13_start', 'nc13_end', 'nc14_start'], index=range(0, datasets_len))
+        columns=['dataset_id', 'nc13_start', 'nc13_end', 'nc14_start'], index=range(0, datasets_len))
+
+    skipped_polymerases_too_high = 0
 
     # %% Identification of starts and ends of the ncs 13 and 14
-    # nc = 13
-    dataset_id = 2
+    # dataset_id = 2
     for dataset_id in trange(datasets_len):
+        # dataset_id = 29
         [dataset_id]
 
         start_nc13_frame = np.nan
@@ -30,12 +32,7 @@ def identify_ncs(data):
         bl_search_nc13 = True
 
         # Select data
-        # dataset = data[data.dataset_id == dataset_id]
         dataset_nc_data = data[(data.dataset_id == dataset_id)]
-
-        # # If no nc 13, skip
-        # if dataset_nc_data.count()[0] == 0:
-        #     continue
 
         dataset_name = dataset_nc_data.dataset.iloc[0]
         dataset_name
@@ -187,24 +184,16 @@ def identify_ncs(data):
                     break
         start_nc14_frame
 
-        # # Manual corrections
-        # if dataset_id == 26:
-        #     start_nc14_frame += 1
-        # elif dataset_id == 29:
-        #     start_nc14_frame += 1
-        # elif dataset_id == 54:
-        #     start_nc14_frame += 4
-        # elif dataset_id == 69:
-        #     start_nc14_frame += 1
+        # If the dataset features polymerase numbers higher than 200, that must be a data error
+        # The data will be rechecked
+        if avg_dataset_nc_data.polymerases.max() >= max_reasonable_polymerase_number:
+            [start_nc13_frame, end_nc13_frame,
+                start_nc14_frame] = np.nan * np.asarray([1, 1, 1])
+            skipped_polymerases_too_high += 1
 
-        # elif dataset_id == 55:
-        #     start_nc14_frame += 4
-        # elif dataset_id == 74:
-        #     start_nc14_frame += 2
-        start_nc14_frame
-
-        # Save ncs locations
-        ncs_locations.loc[dataset_id] = [start_nc13_frame, end_nc13_frame, start_nc14_frame]
+            # Save ncs locations
+        ncs_locations.loc[dataset_id] = [dataset_id,
+                                         start_nc13_frame, end_nc13_frame, start_nc14_frame]
 
         # Plot
         fit_interval = [0, 0]  # np.asarray(fit_frames) * mins_per_frame * 0
@@ -212,6 +201,12 @@ def identify_ncs(data):
         filename = 'slopes_dataset_%i.png' % (dataset_id)
         filepath = os.path.join(nc13_folder, filename)
         save_series_plot(x=avg_dataset_nc_data.time_min,
-                         y=avg_dataset_nc_data.polymerases, a=0, b=0, fit_interval=fit_interval, vbars=vbars, filename=filepath, dataset_name=dataset_name)
+                         y=avg_dataset_nc_data.polymerases, a=0, b=0, fit_interval=fit_interval, vbars=vbars, filename=filepath, dataset_name=dataset_name, dataset_id=dataset_id)
+        # return
+
+    # Report errors
+    if skipped_polymerases_too_high > 0:
+        print("Warning: %i datasets skipped due to polymerase values >= %.0f" %
+              (skipped_polymerases_too_high, max_reasonable_polymerase_number))
 
     return ncs_locations
