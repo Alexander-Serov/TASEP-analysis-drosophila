@@ -29,5 +29,8 @@ max_reasonable_polymerase_number = 200
 # %% Multithreading
 cpu_count = 11
 
-# %% Theory
+# %% TASEP Theory
 slope_theory = 26   # pol/min
+
+# %% Bayes factors
+n_pi = 4
