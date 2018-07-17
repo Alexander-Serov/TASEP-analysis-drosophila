@@ -21,7 +21,7 @@ from multiprocessing import Pool
 import numpy as np
 import os
 import pandas as pd
-from plot_histograms import plot_histograms
+from plot_slope_histograms import plot_slope_histograms
 from reinit_folder import reinit_folder
 from save_series_plot import save_series_plot
 from tqdm import trange
@@ -83,7 +83,7 @@ else:
 
 
 # %% Plot the histograms of the slopes distribution
-plot_histograms(slopes)
+plot_slope_histograms(slopes)
 
 #
 
