@@ -2,9 +2,10 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 from set_figure_size import set_figure_size
 
-from constants import slope_theory
+from constants import N_simple_theory, figures_folder
 
 
 def plot_max_histograms(slopes):
@@ -12,15 +13,18 @@ def plot_max_histograms(slopes):
     rows = 1
     cols = 3
     alpha = 0.8
-    xlims = [0, 100]
+    xlims = [0, 115]
     genes_names = ['Hunchback', 'Knirps', 'Snail']
     hist_color = np.asarray([117, 145, 41]) / 255
     linewidth = 0.5
     dashes = (6, 6)
+    label_location = [0.03, 0.875]
+    font_size = 8
+    height_factor = 0.7
 
     # fig = plt.figure(num=2)
     # fig.clf()
-    set_figure_size(num=3, rows=1, page_width_frac=1, height_factor=0.8)
+    set_figure_size(num=3, rows=1, page_width_frac=1, height_factor=height_factor)
     fig, axarr = plt.subplots(num=3, nrows=rows, ncols=cols, sharex=True, sharey=True)
 
     def plot_one_hist(maxima_no_nan, **kwargs):
@@ -44,6 +48,11 @@ def plot_max_histograms(slopes):
         if traces_len > 0:
             plot_one_hist(gene_maxima_all_nc)
 
+        # Add label
+        str_label = chr(ord('d') + gene_id)
+        ax.text(label_location[0], label_location[1],
+                str_label, transform=ax.transAxes, fontsize=font_size)
+
         # Adjust
         plt.xlabel('Max. polymerase number')
         if gene_id == 0:
@@ -52,12 +61,15 @@ def plot_max_histograms(slopes):
         str_title = '\emph{%s} ($n=%i$)' % (genes_names[gene_id], traces_len)
         plt.title(str_title)
 
-    # # Add theoretical limit
-    # x_theor = np.asarray([1, 1]) * slope_theory
-    # y_theor = np.asarray(plt.ylim())
-    # # y_theor[1] *= 0.9
-    # for ax in axarr:
-    #     ax.plot(x_theor, y_theor, 'k--', linewidth=linewidth, dashes=dashes)
+    # Add theoretical limit
+    x_theor = np.asarray([1, 1]) * N_simple_theory
+    y_theor = np.asarray(plt.ylim())
+    # y_theor[1] *= 0.9
+    for ax in axarr:
+        ax.plot(x_theor, y_theor, 'k--', linewidth=linewidth, dashes=dashes)
 
     fig.tight_layout()
     plt.show()
+
+    figpath = os.path.join(figures_folder, "max_histograms.pdf")
+    plt.savefig(figpath)
