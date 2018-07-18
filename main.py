@@ -26,14 +26,13 @@ from plot_slope_histograms import plot_slope_histograms
 from plot_max_histograms import plot_max_histograms
 from reinit_folder import reinit_folder
 from save_series_plot import save_series_plot
+from slopes_to_tex import slopes_to_tex
 from tqdm import trange
 
 from constants import data_folder, matlab_csv_data_file, mins_per_frame, output_slopes_folder, detect_nc13_leftovers_interval_frames, nc13_folder, min_nc13_length_minutes, max_nc13_length_minutes, slope_length_frames, cpu_count, ncs_locations_file, slopes_file, n_pi
 
 
 # # %% Initialize
-# reinit_folder(output_slopes_folder)
-# reinit_folder(nc13_folder)
 
 
 # %% Import
@@ -66,9 +65,9 @@ else:
 
 # %% Calculate the slopes in each trace
 filepath = os.path.join(data_folder, slopes_file)
-bl_recalculate_slopes = False
+bl_load = True
 # bl_recalculate_slopes = True
-if not bl_recalculate_slopes and os.path.exists(filepath):
+if bl_load and os.path.exists(filepath):
     slopes = pd.read_csv(filepath, sep=';')
 else:
     # Initialize
@@ -177,8 +176,11 @@ plt.show()
 
 #
 
-# %%
+# %% Output slopes table to tex file
+slopes_to_tex(slopes)
 
+
+# %%
 
 # cur_slopes
 
