@@ -171,3 +171,6 @@ venv.bak/
 ./output_slopes/slopes_dataset_9_nc_14.png
 output_slopes/
 output_nc13/
+figures/max_histograms.pdf
+figures/slope_histograms.pdf
+table_s_NSS_data.tex
