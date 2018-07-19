@@ -13,6 +13,7 @@ def calculate_slopes(data, ncs_locations, trace_id):
     dataset_id = data.dataset_id.iloc[0]
     gene_id = data.gene_id.iloc[0]
     construct_id = data.construct_id.iloc[0]
+    AP = data.MeanAP.iloc[0]
     dataset_id
 
     def get_slope(start_frame):
@@ -58,5 +59,5 @@ def calculate_slopes(data, ncs_locations, trace_id):
     max_polymerase_nc14 = get_mean_max(start_nc14_frame, end_nc14_frame)
 
     slope_series = pd.Series({'dataset_id': dataset_id, 'gene_id':
-                              gene_id, 'construct_id': construct_id, 'slope_nc13': slope_nc13, 'slope_nc14': slope_nc14, 'max_nc13': max_polymerase_nc13, 'max_nc14': max_polymerase_nc14})
+                              gene_id, 'construct_id': construct_id, 'slope_nc13': slope_nc13, 'slope_nc14': slope_nc14, 'max_nc13': max_polymerase_nc13, 'max_nc14': max_polymerase_nc14, 'AP': AP})
     return slope_series

@@ -41,6 +41,10 @@ slope_abortive_theory_error = 3   # pol/min
 L_min = 5631  # minimum gene length (without 3' UTR), bp
 N_simple_theory = L_min / sqrt(l) / (1 + sqrt(l))
 
+# %% Gene expression patterns
+hb_AP_interval = [0.25, 0.3]
+kn_AP_interval = [0.6, 0.63]
+
 # %% Bayes factors
 n_pi = 4
 
