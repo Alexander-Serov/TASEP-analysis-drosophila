@@ -14,7 +14,7 @@ mins_per_frame = 37 / 60.
 detect_nc13_leftovers_interval_frames = 10
 min_nc13_length_minutes = 7
 max_nc13_length_minutes = 23
-slope_length_frames = 7  # 7 frames corresponds to ~4 mins
+slope_length_frames = 6  # 7 frames corresponds to ~4 mins
 
 # avg_slope_length_min = 3    # the length of the slope to look for with a sliding window
 # avg_slope_length_frames = np.round(avg_slope_length_min / mins_per_frame).astype(np.int64)
@@ -43,7 +43,7 @@ N_simple_theory = L_min / sqrt(l) / (1 + sqrt(l))
 
 # %% Gene expression patterns
 hb_AP_interval = [0.25, 0.3]
-kn_AP_interval = [0.6, 0.63]
+kn_AP_interval = [0.6, 0.64]
 
 # %% Bayes factors
 n_pi = 4

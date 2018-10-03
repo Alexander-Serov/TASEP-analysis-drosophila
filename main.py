@@ -11,26 +11,33 @@ else:
     print("Graphic interface NOT re-initialized")
 
 
-from calculate_bayes_factor import calculate_bayes_factor
-from calculate_slopes import calculate_slopes
+import os
 # from find_best_fit import find_best_fit
 from functools import partial
-from identify_ncs import identify_ncs
+from multiprocessing import Pool
+
 # from identify_shift_and_slope import identify_shift_and_slope
 import matplotlib.pyplot as plt
-from multiprocessing import Pool
 import numpy as np
-import os
 import pandas as pd
-from plot_slope_histograms import plot_slope_histograms
+from tqdm import trange
+
+from calculate_bayes_factor import calculate_bayes_factor
+from calculate_slopes import calculate_slopes
+from constants import (cpu_count, data_folder,
+                       detect_nc13_leftovers_interval_frames,
+                       matlab_csv_data_file, max_nc13_length_minutes,
+                       min_nc13_length_minutes, mins_per_frame, n_pi,
+                       nc13_folder, ncs_locations_file, output_slopes_folder,
+                       slope_length_frames, slopes_file)
+from detect_y_regions_in_snail import detect_y_regions_in_snail
+from identify_ncs import identify_ncs
 from plot_max_histograms import plot_max_histograms
+from plot_slope_histograms import plot_slope_histograms
+from plot_slopes_boxplot import plot_slopes_boxplot
 from reinit_folder import reinit_folder
 from save_series_plot import save_series_plot
 from slopes_to_tex import slopes_to_tex
-from tqdm import trange
-
-from constants import data_folder, matlab_csv_data_file, mins_per_frame, output_slopes_folder, detect_nc13_leftovers_interval_frames, nc13_folder, min_nc13_length_minutes, max_nc13_length_minutes, slope_length_frames, cpu_count, ncs_locations_file, slopes_file, n_pi
-
 
 # # %% Initialize
 
@@ -48,14 +55,14 @@ intersects = np.ones([traces_len, 1]) * np.nan
 slopes = np.ones([traces_len, 1]) * np.nan
 
 # %% Identify the locations of nc13 and nc 14 in the data
-bl_load = True
-# bl_load = False
+# bl_load = True
+bl_load = False
 filepath = os.path.join(data_folder, ncs_locations_file)
 if bl_load & os.path.exists(filepath):
     ncs_locations = pd.read_csv(filepath, sep=';')
 else:
     # Initialize folders
-    reinit_folder(output_slopes_folder)
+    # reinit_folder(output_slopes_folder)
     reinit_folder(nc13_folder)
     ncs_locations = identify_ncs(data)
     # Save
@@ -63,30 +70,38 @@ else:
 # ncs_locations
 
 
-# %% Calculate the slopes in each trace
+# %% Calculate the slopes by group
 filepath = os.path.join(data_folder, slopes_file)
 bl_load = True
-# bl_recalculate_slopes = True
+# bl_load = False
 if bl_load and os.path.exists(filepath):
     slopes = pd.read_csv(filepath, sep=';')
 else:
     # Initialize
-    slopes = pd.DataFrame(columns=['dataset_id', 'gene_id', 'construct_id',
-                                   'slope_nc13', 'slope_nc14', 'max_nc13', 'max_nc14'], index=range(traces_len), dtype=np.float64)
+    slopes = pd.DataFrame(columns=['dataset_id', 'gene_id', 'construct_id', 'AP',
+                                   'slope_nc13', 'slope_nc14', 'max_nc13', 'max_nc14', 'slope_nc13_count', 'slope_nc14_count'], index=range(datasets_len), dtype=np.float64)
 
-    for trace_id in trange(0 + 1 * traces_len):
-        slopes.iloc[trace_id] = calculate_slopes(
-            data[data.trace_id == trace_id], ncs_locations, trace_id)
+    for dataset_id in trange(datasets_len):
+        slopes.iloc[dataset_id] = calculate_slopes(
+            data[data.dataset_id == dataset_id], ncs_locations)
 
     # Save
-    slopes.to_csv(filepath, sep=';')
+    # slopes.to_csv(filepath, sep=';')
 
+slopes.dtypes
 slopes
 
 
-# %% Plot the histograms of the slopes distribution
-plot_slope_histograms(slopes)
-plot_max_histograms(slopes)
+# %% Detect y regions in the snail data
+# detect_y_regions_in_snail(data)
+
+
+# # %% Plot the histograms of the slopes distribution
+# plot_slope_histograms(slopes)
+# plot_max_histograms(slopes)
+
+# %% Boxplots
+plot_slopes_boxplot(slopes)
 
 
 # %% Calculate Bayes factors for slopes
