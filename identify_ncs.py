@@ -1,12 +1,51 @@
 
 
-import numpy as np
 import os
+import warnings
+
+import numpy as np
 import pandas as pd
-from save_series_plot import save_series_plot
 from tqdm import trange
 
-from constants import mins_per_frame, min_nc13_length_minutes, max_nc13_length_minutes, nc13_folder, max_reasonable_polymerase_number
+from constants import (max_nc13_length_minutes,
+                       max_reasonable_polymerase_number,
+                       min_nc13_length_minutes, mins_per_frame, nc13_folder)
+from save_series_plot import save_series_plot
+
+# Manual nc locations corrections list for different data sets
+start_frame_corrections = {
+    '2014-10-13-hbBAC_NoPrim_B': 39,
+    '2014-10-14-hbBAC_NoPrim_B': 16,
+    '2014-10-30-hbBAC_NoPrim_A': 14,
+    '2014-07-08-kniBAC': 49,
+    '2014-07-09-kniBAC': 44,
+    '2014-03-01-SnaBAC_B': 41,
+    '2014-03-05-SnaBAC_NoPrim_B': 42,
+    '2014-04-06-SnaBAC_NoPrim_A': 41,
+    '2014-05-17-SnaBAC_NoShad_A': 62,
+    '2014-06-06-SnaBACA': 15,
+    '2014-06-10-SnaBAC_NoPrim_C': 30,
+    '2014-06-05-SnaBACA': 21,
+}
+
+start_nc13_frame_corrections = {
+    '2014-03-16-HbBAC_NoPrim_A': 8,
+    '2014-10-24-hbBAC_NoShad_C': np.nan,
+    '2014-08-20-kniBAC_NoShad_B': np.nan,
+    '2014-08-21-kniBAC_NoShad_A': np.nan,
+    '2014-05-27-SnaBAC_NoShad_A': np.nan,
+    '2014-05-28-SnaBAC_NoShad_A': np.nan,
+    '2014-06-05-SnaBACB': np.nan,
+}
+end_nc13_frame_corrections = {
+    '2014-03-16-HbBAC_NoPrim_A': 27,
+    '2014-10-24-hbBAC_NoShad_C': 4,
+    '2014-08-20-kniBAC_NoShad_B': 7,
+    '2014-08-21-kniBAC_NoShad_A': 4,
+    '2014-05-27-SnaBAC_NoShad_A': 6,
+    '2014-05-28-SnaBAC_NoShad_A': 5,
+    '2014-06-05-SnaBACB': 5,
+}
 
 
 def identify_ncs(data):
@@ -18,7 +57,7 @@ def identify_ncs(data):
     ncs_locations = pd.DataFrame(
         columns=['dataset_id', 'nc13_start', 'nc13_end', 'nc14_start'], index=range(0, datasets_len))
 
-    skipped_polymerases_too_high = 0
+    skipped_polymerases_too_high = []
 
     # %% Identification of starts and ends of the ncs 13 and 14
     # dataset_id = 2
@@ -35,81 +74,43 @@ def identify_ncs(data):
         dataset_nc_data = data[(data.dataset_id == dataset_id)]
 
         dataset_name = dataset_nc_data.dataset.iloc[0]
-        dataset_name
+        # print(dataset_id, dataset_name)
 
         # Average
         avg_dataset_nc_data = dataset_nc_data.groupby('Frame').mean()
-        avg_dataset_nc_data
-        start_frame = avg_dataset_nc_data.index.min()
+        # print(avg_dataset_nc_data)
+        # break
+
+        # Manual corrections for nc 13
+        if dataset_name in start_nc13_frame_corrections.keys():
+            start_nc13_frame = start_nc13_frame_corrections[dataset_name]
+            end_nc13_frame = end_nc13_frame_corrections[dataset_name]
+            bl_search_nc13 = False
+
+        # Manual corrections for first frame search
+        if dataset_name in start_frame_corrections.keys():
+            start_frame = start_frame_corrections[dataset_name]
+        else:
+            start_frame = avg_dataset_nc_data.index.min()
+
         end_frame = avg_dataset_nc_data.index.max()
 
-        # Manual corrections
-        if dataset_id == 2:
-            start_nc13_frame = 8
-            end_nc13_frame = 27
-            bl_search_nc13 = False
-        if dataset_id == 31:
-            start_frame = 39
-        elif dataset_id == 32:
-            start_frame = 16
-        elif dataset_id == 36:
-            start_nc13_frame = np.nan
-            end_nc13_frame = 4
-            bl_search_nc13 = False
-        elif dataset_id == 38:
-            start_frame = 14
-        if dataset_id == 44:
-            start_frame = 49
-        elif dataset_id == 45:
-            start_frame = 44
-        elif dataset_id == 52:
-            start_nc13_frame = np.nan
-            end_nc13_frame = 7
-            bl_search_nc13 = False
-        elif dataset_id == 53:
-            start_nc13_frame = np.nan
-            end_nc13_frame = 4
-            bl_search_nc13 = False
-        elif dataset_id == 56:
-            start_frame = 41
-        elif dataset_id == 59:
-            start_frame = 42
-        elif dataset_id == 62:
-            start_frame = 41
-        elif dataset_id == 64:
-            start_frame = 62
-        elif dataset_id == 65:
-            start_nc13_frame = np.nan
-            end_nc13_frame = 6
-            bl_search_nc13 = False
-        elif dataset_id == 66:
-            start_nc13_frame = np.nan
-            end_nc13_frame = 5
-            bl_search_nc13 = False
-        elif dataset_id == 67:
-            start_frame += 20
-        elif dataset_id == 68:
-            start_nc13_frame = np.nan
-            end_nc13_frame = 5
-            bl_search_nc13 = False
-        elif dataset_id == 69:
-            start_frame = 15
-        elif dataset_id == 76:
-            start_frame = 30
-        [start_frame, end_frame]
+        def has_data(frame):
+            return avg_dataset_nc_data[avg_dataset_nc_data.index == frame].count()[0] > 0
 
+        # Search for the location of the ncs
         tries = 5
         if bl_search_nc13:
             for i in range(tries):
-                # Detect nc13 start frame
+                # Detect nc13 start frame as the start of first 3 sequential frames recorded
                 for start_nc13_frame in range(start_frame, end_frame + 1):
-                    if avg_dataset_nc_data[avg_dataset_nc_data.index == start_nc13_frame].count()[0] > 0 and avg_dataset_nc_data[avg_dataset_nc_data.index == start_nc13_frame + 1].count()[0] > 0 and avg_dataset_nc_data[avg_dataset_nc_data.index == start_nc13_frame + 2].count()[0] > 0:
+                    if has_data(start_nc13_frame) and has_data(start_nc13_frame + 1) and has_data(start_nc13_frame + 2):
                         break
                 start_nc13_frame
 
                 # Detect the end of the nc 13 by the gap in data
                 for end_nc13_frame in range(start_nc13_frame, end_frame + 1):
-                    if avg_dataset_nc_data[avg_dataset_nc_data.index == end_nc13_frame].count()[0] == 0 and avg_dataset_nc_data[avg_dataset_nc_data.index < end_nc13_frame].count()[0] > 2:
+                    if not has_data(end_nc13_frame) and avg_dataset_nc_data[avg_dataset_nc_data.index < end_nc13_frame].count()[0] > 2:
                         end_nc13_frame -= 1
                         break
                 end_nc13_frame
@@ -189,7 +190,7 @@ def identify_ncs(data):
         if avg_dataset_nc_data.polymerases.max() >= max_reasonable_polymerase_number:
             [start_nc13_frame, end_nc13_frame,
                 start_nc14_frame] = np.nan * np.asarray([1, 1, 1])
-            skipped_polymerases_too_high += 1
+            skipped_polymerases_too_high.append(dataset_name)
 
             # Save ncs locations
         ncs_locations.loc[dataset_id] = [dataset_id,
@@ -205,8 +206,9 @@ def identify_ncs(data):
         # return
 
     # Report errors
-    if skipped_polymerases_too_high > 0:
-        print("Warning: %i datasets skipped due to polymerase values >= %.0f" %
-              (skipped_polymerases_too_high, max_reasonable_polymerase_number))
+    if len(skipped_polymerases_too_high) > 0:
+        warnings.warn("Warning: %i datasets skipped due to polymerase values >= %.0f:\n" %
+              (len(skipped_polymerases_too_high), max_reasonable_polymerase_number)), UserWarning)
+        print(skipped_polymerases_too_high)
 
     return ncs_locations

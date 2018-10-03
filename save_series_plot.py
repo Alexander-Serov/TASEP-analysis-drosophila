@@ -1,10 +1,10 @@
 
 
+import os
+
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import os
-
 
 # from constants import output_slopes_folder
 
@@ -43,7 +43,7 @@ def save_series_plot(x, y, a, b, fit_interval, vbars, filename, dataset_name, da
 
     # Labels
     plt.xlabel("Time, min")
-    plt.xlabel("Polymerase number")
+    plt.ylabel("Polymerase number")
     plt.title(str_title)
 
     # plt.show
