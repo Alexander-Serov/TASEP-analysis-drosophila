@@ -1,5 +1,4 @@
 
-
 import os
 
 import matplotlib
@@ -7,14 +6,11 @@ import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
 
-from constants import (construct_labels, gene_labels, hb_AP_interval,
-                       kn_AP_interval, slope_abortive_theory,
-                       slope_simple_theory)
+from constants import hb_AP_interval, kn_AP_interval, slope_simple_theory, gene_labels, construct_labels
 from set_figure_size import set_figure_size
 
 
-def plot_slopes_boxplot(slopes):
-
+def plot_slopes_boxplot_hb(slopes):
     height_factor = 3
     markersize = 2
     ylims = [0, 30]
@@ -44,18 +40,18 @@ def plot_slopes_boxplot(slopes):
     bp = None
     counts = []
 
-    for gene_id in range(3):
-        slopes_gene = slopes[(slopes.gene_id == gene_id)]
-        for nc in [13, 14]:
+    gene_id =
+    slopes_gene = slopes[(slopes.gene_id == gene_id)]
+    for nc in [13, 14]:
             for construct_id in [0, 2, 1]:
                 nc_label = nc_labels[nc - 13]
                 dataset = slopes_gene[(
                     slopes_gene.construct_id == construct_id)][nc_label].dropna()
                 count = dataset.count()
 
-                # if gene_id == 1 and construct_id in [2, 1]:
-                #     print(nc, construct_id)
-                #     print(dataset)
+                if gene_id == 1 and construct_id in [2, 1]:
+                    print(nc, construct_id)
+                    print(dataset)
 
                 datasets.append(dataset.values)
                 datasets_labels.append(f"{construct_labels[construct_id]}{nc}")
@@ -114,13 +110,7 @@ def plot_slopes_boxplot(slopes):
 
     # Add theory
     x_theor = plt.xlim()
-    y_theor_simple = np.asarray([1, 1]) * slope_simple_theory
-    y_theor_abortive = np.asarray([1, 1]) * slope_abortive_theory
-
-    ax.plot(x_theor, y_theor_simple, 'r-', linewidth=linewidth)  # , dashes=dashes)
-    ax.plot(x_theor, y_theor_abortive, 'b--', linewidth=linewidth, dashes=dashes)
-
-    # Labels
-    plt.ylabel('Initial injection rate, pol./min')
+    y_theor = np.asarray([1, 1]) * slope_simple_theory
+    ax.plot(x_theor, y_theor, 'k--', linewidth=linewidth, dashes=dashes)
 
     plt.show()

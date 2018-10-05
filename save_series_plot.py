@@ -51,3 +51,4 @@ def save_series_plot(x, y, a, b, fit_interval, vbars, filename, dataset_name, da
     # Save to file
     # savepath = os.path.join(output_slopes_folder, filename)
     plt.savefig(filename)
+    # plt.close(fig)

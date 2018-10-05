@@ -8,16 +8,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from constants import (construct_labels, gene_labels, hb_AP_interval,
-                       kn_AP_interval, slope_abortive_theory,
+                       kn_AP_interval, max_pol_abortive_theory,
+                       max_pol_simple_theory, slope_abortive_theory,
                        slope_simple_theory)
 from set_figure_size import set_figure_size
 
 
-def plot_slopes_boxplot(slopes):
+def plot_max_num_boxplot(slopes):
 
     height_factor = 3
     markersize = 2
-    ylims = [0, 30]
+    ylims = [0, 120]
     hist_color = np.asarray([117, 145, 41]) / 255
     # hist_color = "#89bc00"
     # color1 = "#9e00f8"
@@ -33,9 +34,9 @@ def plot_slopes_boxplot(slopes):
     xlims = [0.5, 18.5]
     counts_y = 25
 
-    fig = set_figure_size(num=2, rows=1, page_width_frac=0.5, height_factor=height_factor)
+    fig = set_figure_size(num=3, rows=1, page_width_frac=0.5, height_factor=height_factor)
 
-    nc_labels = ['slope_nc13', 'slope_nc14']
+    nc_labels = ['max_nc13', 'max_nc14']
 
     gene_names_full = ['Hunchback', 'Knirps', 'Snail']
 
@@ -114,13 +115,14 @@ def plot_slopes_boxplot(slopes):
 
     # Add theory
     x_theor = plt.xlim()
-    y_theor_simple = np.asarray([1, 1]) * slope_simple_theory
-    y_theor_abortive = np.asarray([1, 1]) * slope_abortive_theory
+    y_theor_simple = np.asarray([1, 1]) * max_pol_simple_theory
+    y_theor_abortive = np.asarray([1, 1]) * max_pol_abortive_theory
+    print(max_pol_abortive_theory)
 
     ax.plot(x_theor, y_theor_simple, 'r-', linewidth=linewidth)  # , dashes=dashes)
     ax.plot(x_theor, y_theor_abortive, 'b--', linewidth=linewidth, dashes=dashes)
 
     # Labels
-    plt.ylabel('Initial injection rate, pol./min')
+    plt.ylabel('Max. polymerase number')
 
     plt.show()

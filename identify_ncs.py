@@ -1,5 +1,6 @@
 
 
+import logging
 import os
 import warnings
 
@@ -36,6 +37,11 @@ start_nc13_frame_corrections = {
     '2014-05-27-SnaBAC_NoShad_A': np.nan,
     '2014-05-28-SnaBAC_NoShad_A': np.nan,
     '2014-06-05-SnaBACB': np.nan,
+    '2014-08-20-kniBAC_NoShad_A': np.nan,
+    '2014-08-22-kniBAC_NoShad_A': 17,
+    '2014-08-14-kniBAC_NoPrim_A': np.nan,
+    '2014-08-14-kniBAC_NoPrim_D': np.nan,
+    '2014-08-15-kniBAC_NoPrim_A': np.nan,
 }
 end_nc13_frame_corrections = {
     '2014-03-16-HbBAC_NoPrim_A': 27,
@@ -45,7 +51,21 @@ end_nc13_frame_corrections = {
     '2014-05-27-SnaBAC_NoShad_A': 6,
     '2014-05-28-SnaBAC_NoShad_A': 5,
     '2014-06-05-SnaBACB': 5,
+    '2014-08-20-kniBAC_NoShad_A': 35,
+    '2014-08-22-kniBAC_NoShad_A': 49,
+    '2014-08-14-kniBAC_NoPrim_A': np.nan,
+    '2014-08-14-kniBAC_NoPrim_D': np.nan,
+    '2014-08-15-kniBAC_NoPrim_A': 60,
 }
+
+# start_nc14_frame_corrections = {
+#     '2014-08-14-kniBAC_NoPrim_A': np.nan,
+# }
+
+
+# class NucCycLocationWarning(RuntimeWarning):
+#     NucCycLocationWarning
+#     pass
 
 
 def identify_ncs(data):
@@ -98,6 +118,13 @@ def identify_ncs(data):
         def has_data(frame):
             return avg_dataset_nc_data[avg_dataset_nc_data.index == frame].count()[0] > 0
 
+        def check_nc_label(frame, var_name, expected_label):
+            if np.isfinite(frame):
+                nc_label = dataset_nc_data.groupby('Frame').median().loc[frame].nc
+                if nc_label != expected_label:
+                    logging.warning(
+                        f"Wrong nc label for {var_name} in dataset={dataset_id}: {nc_label}. Expected: {expected_label}")
+
         # Search for the location of the ncs
         tries = 5
         if bl_search_nc13:
@@ -108,12 +135,21 @@ def identify_ncs(data):
                         break
                 start_nc13_frame
 
+                check_nc_label(start_nc13_frame, 'nc13_start', 13)
+                # # print(avg_dataset_nc_data)
+                # nc_label = avg_dataset_nc_data.loc[start_nc13_frame].nc
+                # if nc_label != 13:
+                #     logging.warning(
+                #         f"Wrong nc label for nc13_start in dataset={dataset_id}: {nc_label}")
+
                 # Detect the end of the nc 13 by the gap in data
                 for end_nc13_frame in range(start_nc13_frame, end_frame + 1):
                     if not has_data(end_nc13_frame) and avg_dataset_nc_data[avg_dataset_nc_data.index < end_nc13_frame].count()[0] > 2:
                         end_nc13_frame -= 1
                         break
                 end_nc13_frame
+
+                check_nc_label(end_nc13_frame, 'nc13_end', 13)
 
                 # If nc13 is too short, restart search at its end
                 nc13_len_minutes = (end_nc13_frame - start_nc13_frame) * mins_per_frame
@@ -157,10 +193,13 @@ def identify_ncs(data):
         [start_nc13_frame, end_nc13_frame]
 
         # Detect the start of the nc 14
-        for frame in range(end_nc13_frame + 1, end_frame + 1):
-            if avg_dataset_nc_data[avg_dataset_nc_data.index == frame].count()[0] > 0 and avg_dataset_nc_data[avg_dataset_nc_data.index == frame + 1].count()[0] > 0 and avg_dataset_nc_data[avg_dataset_nc_data.index == frame + 2].count()[0] > 0:
-                start_nc14_frame = frame
-                break
+        if np.isfinite(end_nc13_frame):
+            for frame in range(end_nc13_frame + 1, end_frame + 1):
+                if avg_dataset_nc_data[avg_dataset_nc_data.index == frame].count()[0] > 0 and avg_dataset_nc_data[avg_dataset_nc_data.index == frame + 1].count()[0] > 0 and avg_dataset_nc_data[avg_dataset_nc_data.index == frame + 2].count()[0] > 0:
+                    start_nc14_frame = frame
+                    break
+        else:
+            start_nc14_frame = np.nan
 
         # # If in nc 14, the next point is lower, choose it
         avg_dataset_nc_data.polymerases[avg_dataset_nc_data.index == start_nc14_frame + 1]
@@ -185,6 +224,8 @@ def identify_ncs(data):
                     break
         start_nc14_frame
 
+        check_nc_label(start_nc14_frame, 'nc14_start', 14)
+
         # If the dataset features polymerase numbers higher than 200, that must be a data error
         # The data will be rechecked
         if avg_dataset_nc_data.polymerases.max() >= max_reasonable_polymerase_number:
@@ -199,7 +240,7 @@ def identify_ncs(data):
         # Plot
         fit_interval = [0, 0]  # np.asarray(fit_frames) * mins_per_frame * 0
         vbars = np.asarray([start_nc13_frame, end_nc13_frame, start_nc14_frame]) * mins_per_frame
-        filename = 'slopes_dataset_%i.png' % (dataset_id)
+        filename = 'ncs_locations_%i.png' % (dataset_id)
         filepath = os.path.join(nc13_folder, filename)
         save_series_plot(x=avg_dataset_nc_data.time_min,
                          y=avg_dataset_nc_data.polymerases, a=0, b=0, fit_interval=fit_interval, vbars=vbars, filename=filepath, dataset_name=dataset_name, dataset_id=dataset_id)
@@ -207,8 +248,9 @@ def identify_ncs(data):
 
     # Report errors
     if len(skipped_polymerases_too_high) > 0:
-        warnings.warn("Warning: %i datasets skipped due to polymerase values >= %.0f:\n" %
-              (len(skipped_polymerases_too_high), max_reasonable_polymerase_number)), UserWarning)
+        # warnings.warn
+        logging.warning("%i datasets skipped due to polymerase values >= %.0f:\n" %
+                        (len(skipped_polymerases_too_high), max_reasonable_polymerase_number))
         print(skipped_polymerases_too_high)
 
     return ncs_locations

@@ -1,4 +1,7 @@
+"""
 
+TODO:
+"""
 
 try:
     has_run
@@ -17,6 +20,8 @@ from functools import partial
 from multiprocessing import Pool
 
 # from identify_shift_and_slope import identify_shift_and_slope
+# import matplotlib
+# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -24,8 +29,8 @@ from tqdm import trange
 
 from calculate_bayes_factor import calculate_bayes_factor
 from calculate_slopes import calculate_slopes
-from constants import (cpu_count, data_folder,
-                       detect_nc13_leftovers_interval_frames,
+from constants import (AP_hist_folder, cpu_count, data_folder,
+                       detect_nc13_leftovers_interval_frames, gene_labels,
                        matlab_csv_data_file, max_nc13_length_minutes,
                        min_nc13_length_minutes, mins_per_frame, n_pi,
                        nc13_folder, ncs_locations_file, output_slopes_folder,
@@ -33,8 +38,11 @@ from constants import (cpu_count, data_folder,
 from detect_y_regions_in_snail import detect_y_regions_in_snail
 from identify_ncs import identify_ncs
 from plot_max_histograms import plot_max_histograms
+from plot_max_num_boxplot import plot_max_num_boxplot
+from plot_one_embryo import plot_one_embryo, plot_xy_in_all_embryos
 from plot_slope_histograms import plot_slope_histograms
 from plot_slopes_boxplot import plot_slopes_boxplot
+# from plot_slopes_boxplot_hb import plot_slopes_boxplot_hb
 from reinit_folder import reinit_folder
 from save_series_plot import save_series_plot
 from slopes_to_tex import slopes_to_tex
@@ -45,6 +53,11 @@ from slopes_to_tex import slopes_to_tex
 # %% Import
 filepath = os.path.join(data_folder, matlab_csv_data_file)
 data = pd.read_csv(filepath, sep=';')
+
+# Calculate mean xPos and yPos for each particle
+data['xPosMean'] = data['xPos'].groupby(data['trace_id']).transform('mean')
+data['yPosMean'] = data['yPos'].groupby(data['trace_id']).transform('mean')
+
 print(data.columns.values)
 
 
@@ -53,6 +66,7 @@ traces_len = data.trace_id.max() + 1
 datasets_len = data.dataset_id.max() + 1
 intersects = np.ones([traces_len, 1]) * np.nan
 slopes = np.ones([traces_len, 1]) * np.nan
+
 
 # %% Identify the locations of nc13 and nc 14 in the data
 # bl_load = True
@@ -67,13 +81,16 @@ else:
     ncs_locations = identify_ncs(data)
     # Save
     ncs_locations.to_csv(filepath, sep=';')
-# ncs_locations
+ncs_locations
 
+# %%
+# data[data.dataset_id == 8]
 
 # %% Calculate the slopes by group
+list(map(reinit_folder, [AP_hist_folder, output_slopes_folder]))
 filepath = os.path.join(data_folder, slopes_file)
-bl_load = True
-# bl_load = False
+# bl_load = True
+bl_load = False
 if bl_load and os.path.exists(filepath):
     slopes = pd.read_csv(filepath, sep=';')
 else:
@@ -81,16 +98,26 @@ else:
     slopes = pd.DataFrame(columns=['dataset_id', 'gene_id', 'construct_id', 'AP',
                                    'slope_nc13', 'slope_nc14', 'max_nc13', 'max_nc14', 'slope_nc13_count', 'slope_nc14_count'], index=range(datasets_len), dtype=np.float64)
 
+    slope_start_pols = []
     for dataset_id in trange(datasets_len):
-        slopes.iloc[dataset_id] = calculate_slopes(
+        slopes.iloc[dataset_id], slope_start_pol = calculate_slopes(
             data[data.dataset_id == dataset_id], ncs_locations)
+        slope_start_pols += slope_start_pol
 
     # Save
-    # slopes.to_csv(filepath, sep=';')
+    slopes.to_csv(filepath, sep=';')
 
 slopes.dtypes
 slopes
+slopes.groupby(by=['gene_id', 'construct_id']).count()
+# %%
+# srt_lst = sorted([pol for pol in slope_start_pols if not np.isnan(pol)])
 
+# reinit_folder(r'.\xy_plots')
+# plot_xy_in_all_embryos(data)
+
+# %%
+calculate_slopes(data[data.dataset_id == 28], ncs_locations)
 
 # %% Detect y regions in the snail data
 # detect_y_regions_in_snail(data)
@@ -102,6 +129,7 @@ slopes
 
 # %% Boxplots
 plot_slopes_boxplot(slopes)
+plot_max_num_boxplot(slopes)
 
 
 # %% Calculate Bayes factors for slopes
@@ -116,7 +144,6 @@ def combination(gene_id, construct_id, nc):
     return 6 * gene_id + 2 * construct_id + (nc - 13)
 
 
-gene_labels = ['hb', 'kn', 'sn']
 construct_labels = ['bac', 'no_pr', 'no_sh']
 labels = []
 for gene_id in range(3):

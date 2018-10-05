@@ -21,7 +21,8 @@ slope_length_frames = 6  # 7 frames corresponds to ~4 mins
 # avg_slope_length_frames = 9  # the length of the slope to look for with a sliding window
 # avg_slope_length_frames
 output_slopes_folder = r".\output_slopes"
-nc13_folder = r".\output_nc13"
+nc13_folder = r".\ncs_locations"
+AP_hist_folder = r".\AP_hist"
 ncs_locations_file = r".\ncs_locations.csv"
 slopes_file = r".\slopes.csv"
 max_reasonable_polymerase_number = 200
@@ -35,9 +36,11 @@ cpu_count = 11
 k = 26 * 60  # polymerase elongation rate, pol/min
 tau_rev = 5 / 60  # mean abortive initiation duration taken from Revyakin2006, min
 l = 45  # polymerase footprint, bp
-slope_simple_theory = k / (1 + sqrt(l))**2   # pol/min
+slope_simple_theory = k / (1 + np.sqrt(l))**2   # pol/min
 slope_abortive_theory = (k * tau_rev - 1) / tau_rev / (k * tau_rev + l - 1)
 slope_abortive_theory_error = 3   # pol/min
+max_pol_simple_theory = 109
+max_pol_abortive_theory = max_pol_simple_theory * 0.30
 L_min = 5631  # minimum gene length (without 3' UTR), bp
 N_simple_theory = L_min / sqrt(l) / (1 + sqrt(l))
 
@@ -50,3 +53,6 @@ n_pi = 4
 
 # %% Misc
 figures_folder = r".\figures"
+
+gene_labels = ['hb', 'kn', 'sn']
+construct_labels = {0: 'b', 1: 'np', 2: 'ns'}

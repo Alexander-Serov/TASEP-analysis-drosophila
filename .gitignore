@@ -174,3 +174,6 @@ output_nc13/
 figures/max_histograms.pdf
 figures/slope_histograms.pdf
 table_s_NSS_data.tex
+AP_hist/
+xy_plots/
+ncs_locations/
