@@ -1,5 +1,4 @@
 """
-
 TODO:
 """
 
@@ -37,12 +36,12 @@ from constants import (AP_hist_folder, cpu_count, data_folder,
                        slope_length_frames, slopes_file)
 from detect_y_regions_in_snail import detect_y_regions_in_snail
 from identify_ncs import identify_ncs
+from plot_boxplot_hb import plot_boxplot_hb
 from plot_max_histograms import plot_max_histograms
 from plot_max_num_boxplot import plot_max_num_boxplot
 from plot_one_embryo import plot_one_embryo, plot_xy_in_all_embryos
 from plot_slope_histograms import plot_slope_histograms
 from plot_slopes_boxplot import plot_slopes_boxplot
-# from plot_slopes_boxplot_hb import plot_slopes_boxplot_hb
 from reinit_folder import reinit_folder
 from save_series_plot import save_series_plot
 from slopes_to_tex import slopes_to_tex
@@ -69,8 +68,8 @@ slopes = np.ones([traces_len, 1]) * np.nan
 
 
 # %% Identify the locations of nc13 and nc 14 in the data
-# bl_load = True
-bl_load = False
+bl_load = True
+# bl_load = False
 filepath = os.path.join(data_folder, ncs_locations_file)
 if bl_load & os.path.exists(filepath):
     ncs_locations = pd.read_csv(filepath, sep=';')
@@ -87,10 +86,9 @@ ncs_locations
 # data[data.dataset_id == 8]
 
 # %% Calculate the slopes by group
-list(map(reinit_folder, [AP_hist_folder, output_slopes_folder]))
 filepath = os.path.join(data_folder, slopes_file)
-# bl_load = True
-bl_load = False
+bl_load = True
+# bl_load = False
 if bl_load and os.path.exists(filepath):
     slopes = pd.read_csv(filepath, sep=';')
 else:
@@ -117,7 +115,7 @@ slopes.groupby(by=['gene_id', 'construct_id']).count()
 # plot_xy_in_all_embryos(data)
 
 # %%
-calculate_slopes(data[data.dataset_id == 28], ncs_locations)
+# calculate_slopes(data[data.dataset_id == 28], ncs_locations)
 
 # %% Detect y regions in the snail data
 # detect_y_regions_in_snail(data)
@@ -128,8 +126,9 @@ calculate_slopes(data[data.dataset_id == 28], ncs_locations)
 # plot_max_histograms(slopes)
 
 # %% Boxplots
-plot_slopes_boxplot(slopes)
-plot_max_num_boxplot(slopes)
+# plot_slopes_boxplot(slopes)
+# plot_max_num_boxplot(slopes)
+plot_boxplot_hb(slopes)
 
 
 # %% Calculate Bayes factors for slopes
