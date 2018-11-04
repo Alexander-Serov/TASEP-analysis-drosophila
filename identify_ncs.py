@@ -70,6 +70,27 @@ end_nc13_frame_corrections = {
 
 def identify_ncs(data):
     """
+    The new algorithm that works with Ben's data format. It basically just reads the data already provided.
+    """
+    datasets_len = data.dataset_id.max() + 1
+    ncs_locations = pd.DataFrame(
+        columns=['dataset_id', 'nc13_start', 'nc13_end', 'nc14_start'], index=range(0, datasets_len))
+
+    # %% Identification of starts and ends of the ncs 13 and 14
+    # TODO: Only 14 for the moment
+    for dataset_id in trange(datasets_len):
+        start_nc13_frame = np.nan
+        end_nc13_frame = np.nan
+
+        # Select data
+        dataset_nc_data = data[(data.dataset_id == dataset_id)]
+
+        start_nc14_frame = dataset_nc_data[dataset_nc_data.nc == 14].frame.iloc[0]
+        print(start_nc14_frame)
+
+
+def identify_ncs_madhavs_data(data):
+    """
     Locate the start of nc13, nc14 and the end of nc13 to correctly measure the slopes
     """
 

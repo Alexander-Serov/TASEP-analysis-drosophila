@@ -29,6 +29,7 @@ files_len = length(files);
 error_files = {};
 output = struct([]);
 output_id = 1;
+datasets = {};
 for file_ind = 1: files_len
     file = files(file_ind); 
 
@@ -75,15 +76,16 @@ for file_ind = 1: files_len
         % Get dataset name
         dataset = trace.emName(1:end-1);
         dataset = replace(dataset, '/', '-');
-        
-        
+        if ~ismember(dataset, datasets)
+            datasets{end + 1} = dataset;
+            dataset_id = length(datasets) - 1;
+        end        
 
 
 
         fields = fieldnames(trace);
         frames_len = length(trace.time);
         for frame=1:frames_len
-
             for field_ind = 1:length(fields)
                 field=fields{field_ind};
                 if ~ischar(trace.(field)) && length(trace.(field)) > 1 
@@ -96,11 +98,13 @@ for file_ind = 1: files_len
 
             % Add & drop fields
             output(output_id).dataset = dataset;
+            output(output_id).dataset_id = dataset_id;
             output(output_id).construct = construct;
             output(output_id).construct_id = construct_id;
             output(output_id).gene = gene_folders_short{g_ind};
             output(output_id).gene_id = g_ind - 1;
             output(output_id).trace_id = trace_id;
+            output(output_id).frame = frame - 1;
 %             output(output_id).polymerases = output(output_id).intensity / fluo_per_polymerase;
             
             if output(output_id).time >= 0

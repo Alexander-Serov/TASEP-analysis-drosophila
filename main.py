@@ -29,11 +29,12 @@ from tqdm import trange
 from calculate_bayes_factor import calculate_bayes_factor
 from calculate_slopes import calculate_slopes
 from constants import (AP_hist_folder, cpu_count, data_folder,
-                       detect_nc13_leftovers_interval_frames, gene_labels,
-                       matlab_csv_data_file, max_nc13_length_minutes,
-                       min_nc13_length_minutes, mins_per_frame, n_pi,
-                       nc13_folder, ncs_locations_file, output_slopes_folder,
-                       slope_length_frames, slopes_file)
+                       detect_nc13_leftovers_interval_frames, dt_new,
+                       gene_labels, matlab_csv_data_file,
+                       max_nc13_length_minutes, min_nc13_length_minutes,
+                       mins_per_frame, n_pi, nc13_folder, ncs_locations_file,
+                       output_slopes_folder, slope_length_frames, slopes_file)
+from Dataset import detect_timestep, get_regular_time_mesh
 from detect_y_regions_in_snail import detect_y_regions_in_snail
 from identify_ncs import identify_ncs
 from plot_boxplot_hb import plot_boxplot_hb
@@ -46,18 +47,25 @@ from reinit_folder import reinit_folder
 from save_series_plot import save_series_plot
 from slopes_to_tex import slopes_to_tex
 
-# # %% Initialize
+# Constants
 
 
 # %% Import
 filepath = os.path.join(data_folder, matlab_csv_data_file)
 data = pd.read_csv(filepath, sep=';')
 
+dt, _, _ = detect_timestep(data)
+
+
 # Calculate mean xPos and yPos for each particle
-data['xPosMean'] = data['xPos'].groupby(data['trace_id']).transform('mean')
-data['yPosMean'] = data['yPos'].groupby(data['trace_id']).transform('mean')
+# data['xPosMean'] = data['xPos'].groupby(data['trace_id']).transform('mean')
+# data['yPosMean'] = data['yPos'].groupby(data['trace_id']).transform('mean')
+data['ap_mean'] = data.ap.groupby(data['trace_id']).transform('mean')
 
 print(data.columns.values)
+
+# Create a regular time mesh
+time_mesh_regular = get_regular_time_mesh(data, dt_new)
 
 
 # %% Analyze
@@ -67,39 +75,40 @@ intersects = np.ones([traces_len, 1]) * np.nan
 slopes = np.ones([traces_len, 1]) * np.nan
 
 
-# %% Identify the locations of nc13 and nc 14 in the data
-bl_load = True
-# bl_load = False
-filepath = os.path.join(data_folder, ncs_locations_file)
-if bl_load & os.path.exists(filepath):
-    ncs_locations = pd.read_csv(filepath, sep=';')
-else:
-    # Initialize folders
-    # reinit_folder(output_slopes_folder)
-    reinit_folder(nc13_folder)
-    ncs_locations = identify_ncs(data)
-    # Save
-    ncs_locations.to_csv(filepath, sep=';')
-ncs_locations
+# # %% Identify the locations of nc13 and nc 14 in the data
+# bl_load = True
+# # bl_load = False
+# filepath = os.path.join(data_folder, ncs_locations_file)
+# if bl_load & os.path.exists(filepath):
+#     ncs_locations = pd.read_csv(filepath, sep=';')
+# else:
+#     # Initialize folders
+#     # reinit_folder(output_slopes_folder)
+#     reinit_folder(nc13_folder)
+#     ncs_locations = identify_ncs(data)
+#     # Save
+#     ncs_locations.to_csv(filepath, sep=';')
+# ncs_locations
 
 # %%
 # data[data.dataset_id == 8]
 
-# %% Calculate the slopes by group
+# %% Calculate the slopes by for each dataset (in arbitrary units)
 filepath = os.path.join(data_folder, slopes_file)
-bl_load = True
-# bl_load = False
+# bl_load = True
+bl_load = False
 if bl_load and os.path.exists(filepath):
     slopes = pd.read_csv(filepath, sep=';')
 else:
     # Initialize
     slopes = pd.DataFrame(columns=['dataset_id', 'gene_id', 'construct_id', 'AP',
                                    'slope_nc13', 'slope_nc14', 'max_nc13', 'max_nc14', 'slope_nc13_count', 'slope_nc14_count'], index=range(datasets_len), dtype=np.float64)
+    reinit_folder([AP_hist_folder, output_slopes_folder])
 
     slope_start_pols = []
     for dataset_id in trange(datasets_len):
         slopes.iloc[dataset_id], slope_start_pol = calculate_slopes(
-            data[data.dataset_id == dataset_id], ncs_locations)
+            data[data.dataset_id == dataset_id])
         slope_start_pols += slope_start_pol
 
     # Save

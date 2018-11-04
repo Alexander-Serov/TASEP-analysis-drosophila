@@ -4,19 +4,19 @@ import os
 import shutil
 
 
-def reinit_folder(folder):
+def reinit_folder(folders):
     """
     Clear folder contents or create folder if necessary.
     """
+    for folder in folders:
+        if not os.path.isdir(folder):
+            os.makedirs(folder)
+        else:
+            for file in os.listdir(folder):
+                file_path = os.path.join(folder, file)
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
 
-    if not os.path.isdir(folder):
-        os.makedirs(folder)
-    else:
-        for file in os.listdir(folder):
-            file_path = os.path.join(folder, file)
-            if os.path.isfile(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
-
-    print(f"Folder {folder} cleaned successfully!")
+        print(f"Folder {folder} cleaned successfully!")
