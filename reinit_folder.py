@@ -8,6 +8,8 @@ def reinit_folder(folders):
     """
     Clear folder contents or create folder if necessary.
     """
+    if isinstance(folders, str):
+        folders = [folders]
     for folder in folders:
         if not os.path.isdir(folder):
             os.makedirs(folder)
@@ -19,4 +21,4 @@ def reinit_folder(folders):
                 elif os.path.isdir(file_path):
                     shutil.rmtree(file_path)
 
-        print(f"Folder {folder} cleaned successfully!")
+        print(f"Folder '{folder}' cleaned successfully!")

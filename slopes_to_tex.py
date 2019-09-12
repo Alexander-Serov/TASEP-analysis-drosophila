@@ -1,6 +1,7 @@
 
 
-from constants import tex_slopes_data_file, slope_abortive_theory, slope_abortive_theory_error
+from constants import (slope_abortive_theory, slope_abortive_theory_error,
+                       tex_slopes_data_file)
 
 
 def slopes_to_tex(slopes):
@@ -19,7 +20,7 @@ def slopes_to_tex(slopes):
                     slopes.construct_id == construct_id)][column_label].dropna()
 
                 mean = cur_data.mean()
-                std = cur_data.std()
+                std = np.std(cur_data, ddof=1)
 
                 # Prepare output string
                 out_str += "\t&\t$%.0f\\pm%.0f$" % (mean, std)

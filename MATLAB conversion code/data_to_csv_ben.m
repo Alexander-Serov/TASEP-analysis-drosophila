@@ -6,7 +6,9 @@
 gene_folders_short = {'hb', 'kn', 'sn'};
 data_folder = 'D:\\Experimental_Data\Transcription. Processed data from Ben\';
 csv_output_path = 'D:\\Experimental_Data\Transcription. Processed data from Ben\all_data_new.csv';
-fluo_per_polymerase = 3.5e4/100; % in Stucken.	Am I sure about this number?
+
+global embryos_not_to_use
+embryos_not_to_use = {'2014-03-18-HbBac_NoPrim_A', '2014-10-14-hbBAC_NoPrim_A', '2014-08-13-HbBAC_NoShad_C', '2014-04-04-SnaBAC_A', '2014-03-15-SnaBACB', '2014-06-10-SnaBAC_NoPrim_A',  '2014-08-17-SnaBAC_NoShad_C',    '2014-07-08-kniBAC', '2014-08-14-kniBAC_NoPrim_B',};
 
 %%
 
@@ -62,10 +64,18 @@ for file_ind = 1: files_len
 
 
         % Identify the construct
-        if contains(trace.emName, 'shad', 'IgnoreCase', true)
+        dataset = trace.emName;
+        dataset = replace(dataset, '/', '_');
+        dataset = replace(dataset, '\', '_');
+        if check_drop_dataset(dataset)
+           fprintf('Ignoring embryo "%s"\n', dataset)
+           continue
+        end
+        
+        if contains(dataset, 'shad', 'IgnoreCase', true)
             construct = 'no_sh';
             construct_id = 3;
-        elseif contains(trace.emName, 'prim', 'IgnoreCase', true)
+        elseif contains(dataset, 'prim', 'IgnoreCase', true)
             construct = 'no_pr';
             construct_id = 2;
         else
@@ -73,9 +83,6 @@ for file_ind = 1: files_len
             construct_id = 1;
         end
         
-        % Get dataset name
-        dataset = trace.emName(1:end-1);
-        dataset = replace(dataset, '/', '-');
         if ~ismember(dataset, datasets)
             datasets{end + 1} = dataset;
             dataset_id = length(datasets) - 1;
@@ -131,6 +138,7 @@ output_table = struct2table(output);
 % fid = fopen(csv_output_path,'w'); 
 % fprintf(fid, data_table);
 % fclose(fid);
+
 writetable(output_table, csv_output_path, 'Delimiter', ';');
 
 disp('Folders combined!');
@@ -145,8 +153,22 @@ else
 end
 
 
-
-
+function bl_drop = check_drop_dataset(dataset)
+    global embryos_not_to_use
+    
+    bl_drop = false;
+    % Check that this name is not in the embryos to drop list
+    for i=1:length(embryos_not_to_use)
+        drop_embryo = embryos_not_to_use{i};
+        if contains(dataset, drop_embryo, 'IgnoreCase', true)
+           bl_drop = true;
+           break;
+        end
+    end
+    
+    
+    
+end
 
 
 

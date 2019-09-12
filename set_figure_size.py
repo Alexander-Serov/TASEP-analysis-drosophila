@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def set_figure_size(num, rows, page_width_frac, height_factor=1.0):
+def set_figure_size(num, rows, page_width_frac, height_factor=1.0, clear=True):
     pagewidth_in = 6.85
     font_size = 8
     dpi = 100
 
-    figsize = np.asarray([1.0, 0.33 * rows *
+    figsize = np.asarray([1.0,  rows *
                           height_factor]) * page_width_frac * pagewidth_in  # in inches
 
     # Set default font size
@@ -27,8 +27,8 @@ def set_figure_size(num, rows, page_width_frac, height_factor=1.0):
     ]
 
     # Create and return figure handle
-    fig = plt.figure(num)
-    fig.clf()
+    fig = plt.figure(num, clear=clear)
+    fig.clear()
 
     # Set figure size and dpi
     fig.set_dpi(dpi)

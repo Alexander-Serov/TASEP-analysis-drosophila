@@ -7,8 +7,7 @@ import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
 
-from constants import (construct_labels, gene_labels, hb_AP_interval,
-                       kn_AP_interval, max_pol_abortive_theory,
+from constants import (construct_labels, gene_labels, max_pol_abortive_theory,
                        max_pol_simple_theory, slope_abortive_theory,
                        slope_simple_theory)
 from set_figure_size import set_figure_size

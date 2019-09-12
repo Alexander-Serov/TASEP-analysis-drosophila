@@ -17,6 +17,7 @@ def perform_additivity_test(analyses_in):
     analyses = analyses_in.copy()
     quantities = ['r', 'j', 'alpha_over_k_comb', 'tau', 'alpha_comb']
     genes = set(analyses.gene)
+    constructs = set(analyses.construct)
     gene_ids = set(analyses.gene_id)
     ncs = set(analyses.index.get_level_values(1))
     idx = pd.IndexSlice
@@ -63,7 +64,7 @@ def perform_additivity_test(analyses_in):
 
                 # p - value for additivity
                 if not np.isnan(t):
-                    p = 2 * (student.cdf(-np.abs(t), df=nu))
+                    # p = 2 * (student.cdf(-np.abs(t), df=nu))
                     label = quantity + '_p_value'
                     # Copy the p-value back into the analyses table
                     calc.loc[(gene, nc, 'bac'), label] = p
@@ -92,33 +93,35 @@ def perform_additivity_test(analyses_in):
     # print(gene_ids)
     quantities = ['alpha_comb', 'tau']
     print('p-values for similarity across genes: ')
-    for nc in ncs:
-        for gene_id1 in gene_ids:
-            for gene_id2 in gene_ids:
-                if gene_id2 <= gene_id1:
-                    continue
-                p = {}
-                for quantity in quantities:
-                    calc = pd.DataFrame()
-                    calc['means'] = grouped[quantity].first()
-                    calc['vars'] = grouped[quantity + 'V'].first()
-                    calc['n'] = grouped[quantity].count()
+    for construct in constructs:
+        for nc in ncs:
+            for gene_id1 in gene_ids:
+                for gene_id2 in gene_ids:
+                    if gene_id2 <= gene_id1:
+                        continue
+                    p = {}
+                    for quantity in quantities:
+                        calc = pd.DataFrame()
+                        calc['means'] = grouped[quantity].first()
+                        calc['vars'] = grouped[quantity + 'V'].first()
+                        calc['n'] = grouped[quantity].count()
 
-                    gene1, gene2 = [gene_labels[i] for i in [gene_id1, gene_id2]]
-                    data1 = calc.loc[(gene1, nc, 'bac'), :]
-                    data2 = calc.loc[(gene2, nc, 'bac'), :]
+                        gene1, gene2 = [gene_labels[i] for i in [gene_id1, gene_id2]]
+                        data1 = calc.loc[(gene1, nc, construct), :]
+                        data2 = calc.loc[(gene2, nc, construct), :]
 
-                    p[quantity], t, nu = welchs_test(x1Mean=data1.means, x1V=data1.vars,
-                                                     n1=data1.n, x2Mean=data2.means, x2V=data2.vars, n2=data2.n)
-                    # print(gene_id1, gene_id2
-                    key = (nc, gene1, gene2)
-                    # pVals_across_genes[key] = p
-                    # pVals_across_genes.loc[key, 'p'] = p[quantity]
-                print(
-                    f'nc{nc}, {gene1}, {gene2}:\tp for {quantities[0]} - {p[quantities[0]]:.2g},\tp for {quantities[1]} - {p[quantities[1]]:.2g}')
+                        p[quantity], t, nu = welchs_test(x1Mean=data1.means, x1V=data1.vars,
+                                                         n1=data1.n, x2Mean=data2.means, x2V=data2.vars, n2=data2.n)
+                        # print(gene_id1, gene_id2
+                        key = (nc, gene1, gene2)
+                        # pVals_across_genes[key] = p
+                        # pVals_across_genes.loc[key, 'p'] = p[quantity]
+                    print(
+                        f'{construct}, nc{nc}, {gene1}, {gene2}:\tp for {quantities[0]} - {p[quantities[0]]:.2g},\tp for {quantities[1]} - {p[quantities[1]]:.2g}')
+        print()
 
-                # pVals_across_genes[nc, gene_id1,
-                # gene_id2] = pVals_across_genes[nc, gene_id2, gene_id1] = p
+        # pVals_across_genes[nc, gene_id1,
+        # gene_id2] = pVals_across_genes[nc, gene_id2, gene_id1] = p
 
     # print(pVals_across_genes)
     return analyses
