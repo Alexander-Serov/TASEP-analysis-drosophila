@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import shapiro
 
-from BLUE_estimator import BLUE_estimator, mixed_estimator
+from BLUE_estimator import BLUE_estimator, mixed_estimator_2, mixed_estimator_4
 from constants import L, k, kV, l, lV
 from theoretical_phase_parameters import alpha_over_k_MC
 
@@ -106,7 +106,7 @@ def calculate_alpha(analyses_in, I_est):
                 # Mixed estimator for alpha/k
                 T1 = drop_nan(analyses.loc[(indices, nc), 'alpha_over_k_rho'].values)
                 T2 = drop_nan(analyses.loc[(indices, nc), 'alpha_over_k_J'].values)
-                aoK_mixed, aoK_V, weights = mixed_estimator(T1=T1, T2=T2)
+                aoK_mixed, aoK_V, weights = mixed_estimator_2(T1=T1, T2=T2)
 
                 analyses.loc[(indices, nc), 'alpha_over_k_comb'] = aoK_mixed
                 analyses.loc[(indices, nc), 'alpha_over_k_combV'] = aoK_V
@@ -133,7 +133,7 @@ def calculate_alpha(analyses_in, I_est):
                 # Mixed estimator for alpha/k
                 T1 = drop_nan(tau(analyses.loc[(indices, nc), 'alpha_over_k_rho'].values))
                 T2 = drop_nan(tau(analyses.loc[(indices, nc), 'alpha_over_k_J'].values))
-                tau_mixed, tau_V, weights = mixed_estimator(T1=T1, T2=T2)
+                tau_mixed, tau_V, weights = mixed_estimator_2(T1=T1, T2=T2)
                 analyses.loc[(indices, nc), 'tau'] = tau_mixed
                 analyses.loc[(indices, nc), 'tauV'] = tau_V
                 analyses.loc[(indices, nc),
@@ -159,6 +159,35 @@ def calculate_alpha(analyses_in, I_est):
         f'For tau, normality refuted in {np.sum(refuted_shapiro_tau)} cases out of {len(refuted_shapiro_tau)} at p = {sign_level}')
     print(
         f'For alpha, normality refuted in {np.sum(refuted_shapiro_alpha)} cases out of {len(refuted_shapiro_alpha)} at p = {sign_level}')
+
+    # %% A mixed estimator for alpha combining bac and no shadow (i.e. based on 4 estimators)
+    # print('Hola!!!')
+    for gene in genes:
+        for nc in ncs:
+            indices = (analyses.gene == gene) & (
+                (analyses.construct == 'bac') | (analyses.construct == 'no_sh'))
+            T1 = drop_nan(analyses.loc[(indices, nc), 'alpha_over_k_rho'].values)
+            T2 = drop_nan(analyses.loc[(indices, nc), 'alpha_over_k_J'].values)
+
+            # indices = (analyses.gene == gene) & (analyses.construct == 'no_sh')
+            # T3 = drop_nan(analyses.loc[(indices, nc), 'alpha_over_k_rho'].values)
+            # T4 = drop_nan(analyses.loc[(indices, nc), 'alpha_over_k_J'].values)
+            # print(nc, T1, T2)
+            # if len(T1) != len(T3):
+            #     continue
+
+            aoK_mixed, aoK_V, weights = mixed_estimator_2(T1=T1, T2=T2)
+
+            # print(aoK_mixed, aoK_V, weights)
+
+            analyses.loc[(indices, nc), 'alpha_over_k_bac_no_sh_comb'] = aoK_mixed
+            analyses.loc[(indices, nc), 'alpha_over_k_bac_no_sh_combV'] = aoK_V
+            analyses.loc[(indices, nc), 'alpha_over_k_bac_no_sh_comb_n'] = len(T1)
+            # analyses.loc[(indices, nc),
+            #              'kappa'] = weights[0]
+
+            analyses.loc[(indices, nc), 'alpha_bac_no_sh_comb'] = aoK_mixed * k
+            analyses.loc[(indices, nc), 'alpha_bac_no_sh_combV'] = aoK_V * k**2
 
     return analyses
 
