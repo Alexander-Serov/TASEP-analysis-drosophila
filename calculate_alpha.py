@@ -56,33 +56,6 @@ def calculate_alpha(analyses_in, I_est):
     rhoV = analyses.rhoV
     analyses['alpha_over_k_rho'], analyses['alpha_over_k_rhoV'] = alpha_over_k_rho(rho, rhoV)
     analyses['alpha_rho'] = analyses['alpha_over_k_rho'] * k
-    # print(analyses)
-
-    # def cov_unbiased(x, y):
-    #     nans = np.isnan(x * y)
-    #     if np.sum(~nans) > 0:
-    #         r = np.cov(x[~nans], y[~nans], ddof=1)
-    #         return r[0, 1]
-    #     else:
-    #         return np.nan
-    #
-    # # Estimate average alpha by group taking into account correlations between the 2 estimates
-    # grouped = analyses.groupby(by=['gene', 'construct', 'nc'], as_index=True)
-    # results = pd.DataFrame()
-    # # print(grouped.count()[['alpha_over_k_J', 'alpha_over_k_rho']])
-    #
-    # # alpha / k
-    # aRmean = grouped.alpha_over_k_rho.mean()
-    # aJmean = grouped.alpha_over_k_J.mean()
-    # # aRV = grouped['alpha_over_k_rho'].var(ddof=1)
-    # # aJV = grouped['alpha_over_k_J'].var(ddof=1)
-    # # cov = grouped.apply(lambda group: cov_unbiased(
-    # #     group['alpha_over_k_J'], group['alpha_over_k_rho']))
-    # # print(cov)
-    # # alpha_over_k_comb, alpha_over_k_combV, kappa_opt = BLUE_estimator(
-    # #     aJmean, aJV, aRmean, aRV, cov)
-    # # improve_k = np.min([aRV, aJV], axis=0)
-    # # improve_k = (alpha_over_k_combV - improve_k) / improve_k * 100
 
     def tau(aoK):
         tau = 1 / aoK / k * 60
