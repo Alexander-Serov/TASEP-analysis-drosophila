@@ -16,7 +16,8 @@ from Dataset import get_avg_on_regular_time_mesh
 # In some data sets, nc14 was absent and only nc13 was present. Needed to indentify ncs differently
 # By default the last observed nc in nc14. Add elements to the dictionary if manual adjustements are necessary
 last_ncs = {
-    6: 16,
+    1: 15,
+    6: 14,
     54: 13,
     55: 13,
     56: 13,

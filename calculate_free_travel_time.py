@@ -17,6 +17,8 @@ def calculate_free_travel_time(analyses_in):
     for column in columns:
         analyses[column] = np.nan
 
+    # LV = 5e3 ** 2
+
     # Estimate the prior on the travel time
     T_prior = L / k
     TV_prior = T_prior**2 * (LV / L**2 + kV / k**2)

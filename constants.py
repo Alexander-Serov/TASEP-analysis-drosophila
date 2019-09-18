@@ -13,6 +13,7 @@ matlab_csv_data_file = "all_data.csv"
 # avg_slope_length_frames = 9  # the length of the slope to look for with a sliding window
 # avg_slope_length_frames
 output_slopes_folder = r".\output_slopes"
+figures_folder = r'.\figure'
 nc13_folder = r".\ncs_locations"
 AP_hist_folder = r".\AP_hist"
 ncs_locations_file = r".\ncs_locations.csv"
@@ -45,7 +46,7 @@ max_pol_simple_theory = 109
 max_pol_abortive_theory = max_pol_simple_theory * 0.30
 L_min = 5631  # minimum gene length (without 3' UTR), bp
 L = L_min
-LV = 1000**2             # var(L)
+LV = 5e3**2             # var(L)
 N_simple_theory = L_min / sqrt(l) / (1 + sqrt(l))
 
 # %% Slope detection
@@ -84,15 +85,15 @@ s13_hb_bac = 7  # pol/min calibration number from Ben's Cell 2018 article
 # Noise thresholds
 default_intensity_threshold = 40
 intensity_thresholds = {0: 30,
-                        1: 35,
-                        2: 25,
+                        1: 40,
+                        2: 15,
                         3: 35,
                         5: 25,
                         6: 20,
                         7: 20,
                         8: 15,
-                        9: 35,
-                        10: 10,
+                        9: 30,
+                        10: 70,
                         11: 25,
                         14: 100,
                         33: 45,
