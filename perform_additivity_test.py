@@ -107,10 +107,6 @@ def perform_additivity_test(analyses_in):
 
     # Evaluate additivity
 
-    # Add sum of constructs
-    # for col in ['t', 'nu']:
-    #     calc[col] = np.nan
-
     # pVals_across_genes = np.full((len(ncs), len(genes), len(genes)), np.nan)
     # print([ncs, genes, genes])
     index = pd.MultiIndex.from_product([ncs, genes, genes])

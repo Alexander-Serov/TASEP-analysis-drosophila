@@ -1,3 +1,14 @@
+try:
+    has_run
+except NameError:
+    %matplotlib tk
+    %load_ext autoreload
+    %autoreload 2
+    has_run = 1
+else:
+    print("Graphic interface NOT re-initialized")
+
+
 import numpy as np
 from scipy.special import erf, gammaln
 

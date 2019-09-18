@@ -167,14 +167,14 @@ nc = 13
 avg_slope_13 = np.nanmean(
     analyses[(analyses.gene == 'hb') & (analyses.construct == 'bac')].loc[(slice(None), nc), :]['slope'].values)
 I_est = avg_slope_13 / s13_hb_bac    # fluo/pol
-print(I_est)
+# print(I_est)
 
 analyses = calculate_rho_and_J(analyses, I_est)
 analyses[analyses.gene == 'kn'][['construct', 'rho', 'rhoV', 'JoK', 'JoKV']]
 analyses = calculate_alpha(analyses, I_est)
 # analyses =
-analyses[analyses.gene == 'kn'][['construct', 'rho', 'rhoV',
-                                 'JoK', 'JoKV', 'alpha_over_k_J', 'alpha_over_k_JV', 'alpha_over_k_rho', 'alpha_over_k_rhoV',  'alpha_over_k_comb', 'alpha_over_k_combV']]
+# analyses[analyses.gene == 'kn'][['construct', 'rho', 'rhoV',
+#                                  'JoK', 'JoKV', 'alpha_over_k_J', 'alpha_over_k_JV', 'alpha_over_k_rho', 'alpha_over_k_rhoV',  'alpha_over_k_comb', 'alpha_over_k_combV']]
 
 # %%
 # analyses.columns
@@ -188,7 +188,7 @@ analyses[analyses.gene == 'kn'][['construct', 'rho', 'rhoV',
 # analyses.loc[:, ('construct', 'kappa', 'alpha_origin', 'alpha_over_k_comb', 'alpha_over_k_combV')]
 analyses = perform_additivity_test(analyses)
 analyses[['rho', 'j']].max()
-analyses.columns
+# analyses.columns
 # analyses.loc[(slice(None), 13), ['gene', 'abortive_theory_p_value']].groupby('gene').first()
 
 
