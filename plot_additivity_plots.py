@@ -34,7 +34,7 @@ def plot_additivity_plots(analyses, gene='hb', pdf=False):
 
     for j, quantity in enumerate(['j', 'rho', 'tau', 'alpha_comb']):
         # print(quantity)
-        ymaxs = {'j': 0.36, 'rho': 0.27, 'tau': 80, 'alpha_comb': 12}
+        ymaxs = {'j': 0.36, 'rho': 0.27, 'tau': 103, 'alpha_comb': 12}
         num = 12 + j
         set_figure_size(num=num, rows=1, page_width_frac=0.5, clear=True, height_factor=0.7)
         fig, ax = plt.subplots(1, 1, num=num, clear=True)
@@ -76,7 +76,7 @@ def plot_additivity_plots(analyses, gene='hb', pdf=False):
         plt.ylim(ymax=ymaxs[quantity])
 
         # Add p-values
-        if quantity in ['alpha_comb']:
+        if quantity in []:  # ['alpha_comb']:
             p = all_ps.loc[(gene, slice(None)), quantity + '_p_value'].values
             # y = np.nanmax(avg_data[construct] + std_data[construct]) * 1.1
             # ymax = y * 1.4
