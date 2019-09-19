@@ -30,6 +30,24 @@ To use the code, you need to supply the input data in a form of a table with pre
 
 Python 3
 
+## Algorithm details
+
+### Nuclear cycles detection
+
+The nuclear cycles are detected in each data set by first selecting a background threshold, which separates the continuous trace into nuclear cycles above the threshold.
+The default intensity threshold is defined by `default_intensity_threshold` in `constants.py`.
+If a data set needs individual adjustments to the threshold, they must be put into the `intensity_thresholds` dictionary in `constants.py`.
+
+
+The ncs are then numbered. By default, it is assumed that the last observed nc is nc14.
+In some data sets, not all of the ncs have been recorded, or artefact ncs may be created by thresholding.
+To correct for this problem, one may manually specify the number of the last nc in the data set by adding it into the `last_ncs` dictionary in `identify_ncs.py`.
+
+
+
+
+
+
 
 
 

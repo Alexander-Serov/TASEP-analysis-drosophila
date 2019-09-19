@@ -60,13 +60,6 @@ genes = set(data.gene)
 
 # %% Perform AP filtering
 filtered_data = filter_by_AP(data)
-# # %%
-# filtered_data[filtered_data.gene=='hb']
-# filtered_data.groupby(by=['gene', 'construct', 'nc']).time.transform(
-#     'count')
-# print('Per nc:\n', analyses.groupby(by=['gene', 'construct', 'nc']).Tstart.count())
-# print('\nAll ncs mixed:\n', analyses.copy().reset_index().groupby(
-#     by=['gene', 'construct']).dataset_id.agg(lambda x: x.nunique()))
 
 # %% Detect nuclear cycles
 data_with_ncs, nc_limits = identify_ncs(filtered_data)
