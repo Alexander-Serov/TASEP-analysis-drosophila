@@ -27,8 +27,8 @@ from calculate_alpha import calculate_alpha
 from calculate_free_travel_time import calculate_free_travel_time
 from calculate_rho_and_J import calculate_rho_and_J
 from calculate_slopes import calculate_slopes
-from constants import (AP_hist_folder, data_folder, matlab_csv_data_file,
-                       output_slopes_folder, s13_hb_bac)
+from constants import (AP_hist_folder, data_folder, figures_folder,
+                       matlab_csv_data_file, output_slopes_folder, s13_hb_bac)
 # from Dataset import detect_timestep
 from filter_by_AP import filter_by_AP
 from identify_ncs import identify_ncs
@@ -41,6 +41,7 @@ from reinit_folder import reinit_folder
 
 # Do not show figures, just save to files
 matplotlib.use('Agg')
+reinit_folder(figures_folder)
 
 # Constants
 ncs = range(11, 15)
@@ -123,8 +124,7 @@ analyses = perform_welchs_test(analyses)
 
 
 # %% Plot parameter evolution across ncs in different genes and constructs
-for gene in genes:
-    plot_parameter_evolution(analyses, gene=gene, pdf=True)
+plot_parameter_evolution(analyses, pdf=True)
 
 
 # %% Plot the current-density diagram and the dependencies of j and rho on alpha
