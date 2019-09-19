@@ -113,7 +113,7 @@ else:
     I_est = 25.28255294491828
 print('Using the calibration coefficient I=', I_est)
 
-# %% Estimate polymerase flux, maximal number and alpha
+# %% Use the calibration coeffeicient to estimate the polymerase flux, maximal number and alpha
 analyses = calculate_rho_and_J(analyses, I_est)
 analyses = calculate_alpha(analyses, I_est)
 
