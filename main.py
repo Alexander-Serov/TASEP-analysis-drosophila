@@ -128,7 +128,7 @@ plot_parameter_evolution(analyses, pdf=True)
 
 
 # %% Plot the current-density diagram and the dependencies of j and rho on alpha
-analyses = plot_normalized_current_density_diagram(analyses, I_est, num=7, pdf=True)
+plot_normalized_current_density_diagram(analyses, num=7, pdf=True)
 plot_j_alpha_curve(analyses, pdf=True)
 
 # %% Output all results into a .csv if necessary
