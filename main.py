@@ -115,7 +115,7 @@ print('Using the calibration coefficient I=', I_est)
 
 # %% Use the calibration coeffeicient to estimate the polymerase flux, maximal number and alpha
 analyses = calculate_rho_and_J(analyses, I_est)
-analyses = calculate_alpha(analyses, I_est)
+analyses = calculate_alpha(analyses)
 
 
 # %% Perform Welch's test for equal means

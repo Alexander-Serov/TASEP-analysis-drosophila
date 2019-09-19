@@ -17,7 +17,7 @@ def calculate_rho_and_J(analyses_in, I_est, IV_est=0):
     """
 
     analyses = analyses_in.copy()
-    T = analyses.T
+    T = analyses['T']   # Cannot use a dot because it is going to transpose
     TV = analyses.TV
 
     rho_MC, rho_MCV = rho_MC_func()
