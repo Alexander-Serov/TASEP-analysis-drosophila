@@ -45,17 +45,21 @@ def identify_ncs(data):
     Assume then that the last observed nc is nc14 and shift everything accordingly.
     """
     datasets_len = data.dataset_id.max() + 1
+    ncs = range(11, 15)
 
     # Prepare an output df
     data_out = copy.deepcopy(data)
     data_out['nc'] = np.nan
 
     # Create nc time limits dataframe
-    iterables = pd.MultiIndex.from_product([range(datasets_len), range(11, 15)])
+    iterables = pd.MultiIndex.from_product(
+        [range(datasets_len), ncs], names=['dataset_id', 'nc'])
+    # iterables.set_names(['dataset_id', 'nc'])
+    # print(iterables)
     nc_limits = pd.DataFrame(columns=['Tstart', 'Tend'], index=iterables)
 
     for dataset_id in trange(datasets_len, desc='Processing data sets'):
-        # dataset_id = 13
+        # dataset_id = 54
         dataset_data = data[(data.dataset_id == dataset_id)]
         # print(dataset_id, dataset_data)
         avg_trace, _ = get_avg_on_regular_time_mesh(dataset_data, dt=dt_new)
@@ -114,7 +118,7 @@ def identify_ncs(data):
         # Use the detected nc to label the data on the irregular mesh
         # Index key is a tuple
         # Add as an extra column for the input data frame
-        for nc in range(11, 15):
+        for nc in ncs:
             nc_data = avg_trace[avg_trace.nc == nc]
             if not nc_data.empty:
                 Tstart = avg_trace[avg_trace.nc == nc].index[0]
@@ -122,11 +126,11 @@ def identify_ncs(data):
                 nc_limits.loc[(dataset_id, nc), ['Tstart', 'Tend']] = [Tstart, Tend]
 
         # %% Use the table to label original non-averaged data
-        for nc in range(11, 15):
-            rows = ((data_out.time >= nc_limits.loc[(dataset_id, nc), 'Tstart'])
-                    & (data_out.time <= nc_limits.loc[(dataset_id, nc), 'Tend'])
-                    & (data_out.dataset_id == dataset_id)
-                    )
-            data_out.loc[rows, 'nc'] = nc
+        for nc in ncs:
+            indices = ((data_out.time >= nc_limits.loc[(dataset_id, nc), 'Tstart'])
+                       & (data_out.time <= nc_limits.loc[(dataset_id, nc), 'Tend'])
+                       & (data_out.dataset_id == dataset_id)
+                       )
+            data_out.loc[indices, 'nc'] = nc
     # print(nc_limits)
     return data_out, nc_limits

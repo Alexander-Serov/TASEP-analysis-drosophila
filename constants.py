@@ -3,9 +3,13 @@
 import numpy as np
 from numpy import sqrt
 
-# %% Data import
-data_folder = r"D:\Experimental_Data\Transcription. Processed data from Ben"
-matlab_csv_data_file = "all_data.csv"
+# %% Real data
+# data_folder = r"D:\Experimental_Data\Transcription. Processed data from Ben"
+# matlab_csv_data_file = "all_data.csv"
+
+# Example data
+data_folder = r".\example"
+matlab_csv_data_file = "example_data.csv"
 
 
 # avg_slope_length_min = 3    # the length of the slope to look for with a sliding window

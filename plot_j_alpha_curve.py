@@ -1,10 +1,11 @@
 import itertools
+import os
 
 import numpy as np
 from matplotlib import pyplot as plt
 
-from constants import (Darzacq2007, Tantale2016, colors_additivity, gene_long,
-                       k, l)
+from constants import (Darzacq2007, Tantale2016, colors_additivity,
+                       figures_folder, gene_long, k, l)
 from set_figure_size import set_figure_size
 
 
@@ -74,9 +75,10 @@ def plot_j_alpha_curve(analyses=None, pdf=False):
     plt.show()
     plt.tight_layout()
     figname1 = figname + '_no_data'
-    plt.savefig(figname1 + '.png', pad_inches=0, bbox_inches='tight')
+    figpath = os.path.join(figures_folder, figname1)
+    plt.savefig(figpath + '.png', pad_inches=0, bbox_inches='tight')
     if pdf:
-        plt.savefig(figname1 + '.pdf', pad_inches=0, bbox_inches='tight')
+        plt.savefig(figpath + '.pdf', pad_inches=0, bbox_inches='tight')
 
     # Add current data
     if analyses is not None:
@@ -162,9 +164,10 @@ def plot_j_alpha_curve(analyses=None, pdf=False):
             plt.show()
             plt.tight_layout()
             figname1 = figname + f'_{gene}'
-            plt.savefig(figname1 + '.png', pad_inches=0, bbox_inches='tight')
+            figpath = os.path.join(figures_folder, figname1)
+            plt.savefig(figpath + '.png', pad_inches=0, bbox_inches='tight')
             if pdf:
-                plt.savefig(figname1 + '.pdf', pad_inches=0, bbox_inches='tight')
+                plt.savefig(figpath + '.pdf', pad_inches=0, bbox_inches='tight')
 
             # plot_theoretical_curve(ax, abort=False, norm=True)
             # plot_adjust(analyses_filtered)

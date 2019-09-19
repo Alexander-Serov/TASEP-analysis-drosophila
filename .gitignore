@@ -100,7 +100,8 @@ venv.bak/
 # mkdocs documentation
 /site
 
-# mypy
+
+# User-defined
 *.png
 *.pdf
 *.csv

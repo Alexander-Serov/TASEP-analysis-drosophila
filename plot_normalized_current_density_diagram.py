@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from constants import (LV, Darzacq2007, L, Tantale2016, colors_additivity, k,
-                       kV, l, lV)
+from constants import (LV, Darzacq2007, L, Tantale2016, colors_additivity,
+                       figures_folder, k, kV, l, lV)
 from least_squares_BCES import least_squares_BCES
 from plot_theory_current_density import plot_theoretical_curve
 from reinit_folder import reinit_folder
@@ -15,7 +15,6 @@ from set_figure_size import set_figure_size
 
 height_factor = 0.65
 
-output_folder = 'current-density'
 
 
 def plot_normalized_current_density_diagram(analyses_in, I_est, num, I_estV=0, pdf=True):
@@ -26,8 +25,8 @@ def plot_normalized_current_density_diagram(analyses_in, I_est, num, I_estV=0, p
     # colors = [[0, 0.251, 0], [0, 0, 1], [0.9412, 0.4706, 0], [0.502, 0.251, 0]]
     # ('b', 'brown', 'r', 'g'))
 
-    genes = ['hb', 'kn', 'sn']
-    constructs = ['bac', 'no_pr', 'no_sh']
+    genes = set(analyses.gene)
+    constructs = set(analyses.construct)
     markers = ('x', 'o', '^', 'd', '*')
     # colors = ('#F16822', '#68972F', '#BE2026', 'mediumseagreen')
     colors = [colors_additivity[key] for key in colors_additivity]
@@ -38,7 +37,6 @@ def plot_normalized_current_density_diagram(analyses_in, I_est, num, I_estV=0, p
     ylims = [0, 1.01]
     xlims = [0, 1.02]
 
-    reinit_folder(output_folder)
 
     iterables = pd.MultiIndex.from_product([genes, constructs])
     Ts = pd.DataFrame(columns=['T', 'TV', 'Tstd', 'L', 'LV', 'Lstd'], index=iterables)
@@ -90,7 +88,7 @@ def plot_normalized_current_density_diagram(analyses_in, I_est, num, I_estV=0, p
     plot_adjust()
     plt.ylim(ymin=-0.02)
 
-    figname = os.path.join(output_folder, 'current-density_literature')
+    figname = os.path.join(figures_folder, 'current-density_literature')
     fig.savefig(figname + '.png', pad_inches=0, bbox_inches='tight')
     if pdf:
         fig.savefig(figname + '.pdf', pad_inches=0, bbox_inches='tight')
@@ -144,7 +142,7 @@ def plot_normalized_current_density_diagram(analyses_in, I_est, num, I_estV=0, p
             plt.ylim(ylims)
             plt.xlim(xlims)
 
-            figname = os.path.join(output_folder, 'current-density_' +
+            figname = os.path.join(figures_folder, 'current-density_' +
                                    gene_long[gene] + figname)
             fig.savefig(figname + '.png', pad_inches=0, bbox_inches='tight')
             if pdf:

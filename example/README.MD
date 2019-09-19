@@ -1,0 +1,1 @@
+The example data are taken from the [Bothma et al. 2015](http://dx.doi.org/10.7554/eLife.07956.001) study, which must be cited for any use of the data

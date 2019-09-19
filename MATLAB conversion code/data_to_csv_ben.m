@@ -139,7 +139,7 @@ output_table = struct2table(output);
 % fprintf(fid, data_table);
 % fclose(fid);
 
-writetable(output_table, csv_output_path, 'Delimiter', ';');
+writetable(output_table, csv_output_path, 'Delimiter', ',');
 
 disp('Folders combined!');
 count = length(error_files);

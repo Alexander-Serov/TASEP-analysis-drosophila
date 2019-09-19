@@ -1,20 +1,24 @@
 
 import itertools
+import os
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-from constants import alpha_additivity, colors_additivity, markers_additivity
+from constants import (alpha_additivity, colors_additivity, figures_folder,
+                       markers_additivity)
 from set_figure_size import set_figure_size
 from theoretical_phase_parameters import (J_over_k_LD, alpha_over_k_abortive,
                                           rho_LD)
 
 
-def plot_additivity_plots(analyses, gene='hb', pdf=False):
+def plot_parameter_evolution(analyses, gene='hb', pdf=False):
 
-    constructs = ['bac', 'no_pr', 'no_sh']
+    # all_constructs = ['bac', 'no_pr', 'no_sh']
+    constructs = set(analyses.construct)
+
     # long_labels = ['no shadow', 'no primary', 'bac'] A2142F
-    long_labels = ['bac', 'no pr', 'no sh']
+    long_labels = {'bac': 'bac', 'no_pr': 'no pr', 'no_sh': 'no sh'}
     gene_long = {'hb': 'hunchback', 'kn': 'knirps', 'sn': 'snail'}
     y_label = {'j': 'Normalized flux $j$',
                'rho': 'Site occupation density $\\rho$', 'tau': 'Residence time $\\tau$ (s)', 'alpha_comb': 'Initiation rate $\\alpha$ (pol/min)'}
@@ -58,10 +62,10 @@ def plot_additivity_plots(analyses, gene='hb', pdf=False):
             # print(colors_additivity[construct])
             m = next(marker_gen)
             plt.errorbar(ncs + x_shifts[i], avg_data[construct], yerr=std_data[construct],
-                         fmt='-' + m,  color=colors_additivity[construct], capsize=capsize, label=long_labels[i], markersize=markersize, lw=lw)
+                         fmt='-' + m,  color=colors_additivity[construct], capsize=capsize, label=long_labels[construct], markersize=markersize, lw=lw)
 
-        if gene == 'kn':
-            print(quantity, avg_data, std_data)
+        # if gene == 'kn':
+        #     print(quantity, avg_data, std_data)
 
         # Make a filled region for the sum
         x_fill = ncs.copy().astype(np.float)
@@ -119,6 +123,7 @@ def plot_additivity_plots(analyses, gene='hb', pdf=False):
         plt.show()
 
         figname = 'additivity_' + quantity + '_' + gene
-        fig.savefig(figname + '.png', pad_inches=0, bbox_inches='tight')
+        figpath = os.path.join(figures_folder, figname)
+        fig.savefig(figpath + '.png', pad_inches=0, bbox_inches='tight')
         if pdf:
-            fig.savefig(figname + '.pdf', pad_inches=0, bbox_inches='tight')
+            fig.savefig(figpath + '.pdf', pad_inches=0, bbox_inches='tight')
