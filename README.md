@@ -43,6 +43,14 @@ The ncs are then numbered. By default, it is assumed that the last observed nc i
 In some data sets, not all of the ncs have been recorded, or artefact ncs may be created by thresholding.
 To correct for this problem, one may manually specify the number of the last nc in the data set by adding it into the `last_ncs` dictionary in `identify_ncs.py`.
 
+### Initial slope fitting
+
+The initial slopes are fitted to all points (non-averaged) of a nuclear cycles, in the first several minutes from the beginning of the nuclear cycle.
+The exact fit duration is defined by the `slope_length_mins` constant.
+The procedure is discussed in the accompanying article.
+The nc must contain at least 3 frames to be fitted.
+If the slope fit is negative, a *nan* value is stored instead.
+
 
 
 

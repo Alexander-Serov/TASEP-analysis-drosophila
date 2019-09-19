@@ -16,7 +16,7 @@ matlab_csv_data_file = "example_data.csv"
 # avg_slope_length_frames = np.round(avg_slope_length_min / mins_per_frame).astype(np.int64)
 # avg_slope_length_frames = 9  # the length of the slope to look for with a sliding window
 # avg_slope_length_frames
-output_slopes_folder = r".\output_slopes"
+output_slopes_folder = r".\detected_slopes"
 figures_folder = r'.\figure'
 nc13_folder = r".\ncs_locations"
 AP_hist_folder = r".\AP_hist"

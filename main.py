@@ -80,14 +80,13 @@ for id in datasets:
 analyses = pd.concat([analyses, nc_limits], axis='columns')
 
 
-# %% Calculate initial slopes and maximum polymerase number
+# %% Calculate initial slopes and maximum polymerase numbers
+# You can modify the `save_figures` and `pdf` parameters if necessary
+
 # Clean up the output folder
-# Modify the `save_figures` and `pdf` parameters if necessary
 reinit_folder([AP_hist_folder, output_slopes_folder])
-# analyses2 = copy.deepcopy(analyses)
-for dataset_id in trange(datasets_len):
-    analyses = calculate_slopes(
-        data_with_ncs[data_with_ncs.dataset_id == dataset_id], analyses, save_figures=True, pdf=False)
+analyses = calculate_slopes(
+    data_with_ncs, analyses, save_figures=True, pdf=False)
 
 
 # %% Print the number of available data sets per gene, construct and nc
