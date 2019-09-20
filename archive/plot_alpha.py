@@ -1,10 +1,14 @@
+"""
+This file contains all plot functions used in the project.
+"""
+
 
 import itertools
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-from constants import alpha_additivity, colors_additivity, markers_additivity
+from constants import colors_additivity, markers_additivity
 from set_figure_size import set_figure_size
 from theoretical_phase_parameters import alpha_over_k_abortive
 

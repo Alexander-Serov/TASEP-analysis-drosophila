@@ -19,10 +19,6 @@ def get_regular_time_mesh(data, dt):
     """
     Provide a new regular time mesh with a given dt and a time point at t=0
     """
-    # data_not_nan = data[~np.isnan(data.intensity)]
-    # print('not_nan', data_not_nan)
-    # data_not_nan = data
-    # print('dt', data)
     t_min = data.time.min()
     t_max = data.time.max()
 

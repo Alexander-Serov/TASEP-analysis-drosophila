@@ -1,36 +1,37 @@
-"""
-Perform a Bayesian linear fit for a heteroscedastic set of points with uncertainties along both axes.
-See the accompanying article and D'Agostini2005 for further details of the method.
 
-The method allows not only to attach uncertainties to the data points, but also to the functional relation itself.
-Basically, this means that the relation is a (normal) distribution around its mean rather than a deterministic function relating x and y.
-If the fit converges to sigmaV = 0, this means that the supplied variance of the data can already explain all the variance observed. No need to attach variance to the equaiton.
 
-By default, we use a flat prior for sigmaV and intersect, and a uniform angle prior for the slope.
-A custom prior function can be supplied as a parameter
-
-Parameters:
-x, y    -   float, array-like, lists of coordinates of 2D data points
-Vx, Vy  -   float, array-like, the corresponding of each data point
-c       -   boolean, whether the algorithm should look for a non-zero intersect. Set c = False to make the fit pass through the origin
-prior(m, sigmaV) or prior(m, c, sigmaV) - a prior function. Does not need to be proper
-
-Return:
-m, mV - line slope and its variance
-c, cV - intersect and its variance
-sigmaV, sigmaVV - equation scatter and the variance of its estimator
-"""
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import optimize as opt
 
-# Constants
-plot = False
-
 
 def bayesian_linear_fit(x, y, Vx, Vy, c=True, prior=None):
+    """
+    Perform a Bayesian linear fit for a heteroscedastic set of points with uncertainties along both axes.
+    See the accompanying article and D'Agostini2005 for further details of the method.
+
+    The method allows not only to attach uncertainties to the data points, but also to the functional relation itself.
+    Basically, this means that the relation is a (normal) distribution around its mean rather than a deterministic function relating x and y.
+    If the fit converges to sigmaV = 0, this means that the supplied variance of the data can already explain all the variance observed. No need to attach variance to the equaiton.
+
+    By default, we use a flat prior for sigmaV and intersect, and a uniform angle prior for the slope.
+    A custom prior function can be supplied as a parameter
+
+    Parameters:
+    x, y    -   float, array-like, lists of coordinates of 2D data points
+    Vx, Vy  -   float, array-like, the corresponding of each data point
+    c       -   boolean, whether the algorithm should look for a non-zero intersect. Set c = False to make the fit pass through the origin
+    prior(m, sigmaV) or prior(m, c, sigmaV) - a prior function. Does not need to be proper
+
+    Return:
+    m, mV - line slope and its variance
+    c, cV - intersect and its variance
+    sigmaV, sigmaVV - equation scatter and the variance of its estimator
+    """
+
     sigmaV_guess = 0
     m_guess = 1
+    plot = False
 
     if c:
         # If not passing through the origin

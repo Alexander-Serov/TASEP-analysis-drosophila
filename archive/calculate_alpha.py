@@ -1,12 +1,4 @@
-"""
-Calculates alpha/k based on experimental slopes and steady state N.
-For alpha estimates, we use rho and JoK estimates that are already averaged over differnt embryos of the same group.
-Each group corresponds to a different gene-construct-nc combination.
-After that we construct a mixed estimator based on the two following the method described in Lavancier and Rocher (2016).
 
-The variance of individual alpha estimators is calculated as a sum of squares of variances with partial derivatives:
-V = \sum_i (d alpha / d \theta_i)**2 * var(theta_i)
-"""
 
 import numpy as np
 from scipy.stats import shapiro
@@ -46,6 +38,15 @@ def alpha_over_k_rho(rho, rhoV):
 
 
 def calculate_alpha(analyses_in):
+    """
+    Calculates alpha/k based on experimental slopes and steady state N.
+    For alpha estimates, we use rho and JoK estimates that are already averaged over differnt embryos of the same group.
+    Each group corresponds to a different gene-construct-nc combination.
+    After that we construct a mixed estimator based on the two following the method described in Lavancier and Rocher (2016).
+
+    The variance of individual alpha estimators is calculated as a sum of squares of variances with partial derivatives:
+    V = \sum_i (d alpha / d \theta_i)**2 * var(theta_i)
+    """
 
     analyses = analyses_in.copy()
     significance_level = 0.05
@@ -131,36 +132,6 @@ def calculate_alpha(analyses_in):
         f'For tau, normality refuted in {np.sum(refuted_shapiro_tau)} cases out of {len(refuted_shapiro_tau)} at p = {significance_level}')
     print(
         f'For alpha, normality refuted in {np.sum(refuted_shapiro_alpha)} cases out of {len(refuted_shapiro_alpha)} at p = {significance_level}')
-
-    # # %% A mixed estimator for alpha combining bac and no shadow (i.e. based on 4 estimators). I don't think it is useful for the moment
-
-    # # print('Hola!!!')
-    # for gene in genes:
-    #     for nc in ncs:
-    #         indices = (analyses.gene == gene) & (
-    #             (analyses.construct == 'bac') | (analyses.construct == 'no_sh'))
-    #         T1 = drop_nan(analyses.loc[(indices, nc), 'alpha_over_k_rho'].values)
-    #         T2 = drop_nan(analyses.loc[(indices, nc), 'alpha_over_k_J'].values)
-    #
-    #         # indices = (analyses.gene == gene) & (analyses.construct == 'no_sh')
-    #         # T3 = drop_nan(analyses.loc[(indices, nc), 'alpha_over_k_rho'].values)
-    #         # T4 = drop_nan(analyses.loc[(indices, nc), 'alpha_over_k_J'].values)
-    #         # print(nc, T1, T2)
-    #         # if len(T1) != len(T3):
-    #         #     continue
-    #
-    #         aoK_mixed, aoK_V, weights = mixed_estimator_2(T1=T1, T2=T2)
-    #
-    #         # print(aoK_mixed, aoK_V, weights)
-    #
-    #         analyses.loc[(indices, nc), 'alpha_over_k_bac_no_sh_comb'] = aoK_mixed
-    #         analyses.loc[(indices, nc), 'alpha_over_k_bac_no_sh_combV'] = aoK_V
-    #         analyses.loc[(indices, nc), 'alpha_over_k_bac_no_sh_comb_n'] = len(T1)
-    #         # analyses.loc[(indices, nc),
-    #         #              'kappa'] = weights[0]
-    #
-    #         analyses.loc[(indices, nc), 'alpha_bac_no_sh_comb'] = aoK_mixed * k
-    #         analyses.loc[(indices, nc), 'alpha_bac_no_sh_combV'] = aoK_V * k**2
 
     return analyses
 

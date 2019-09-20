@@ -20,13 +20,8 @@ output_slopes_folder = r".\detected_slopes"
 figures_folder = r'.\figure'
 nc13_folder = r".\ncs_locations"
 AP_hist_folder = r".\AP_hist"
-ncs_locations_file = r".\ncs_locations.csv"
-slopes_file = r".\slopes.csv"
 tex_slopes_data_file = r".\table_s_NSS_data.tex"
 
-
-# %% Multithreading
-cpu_count = 11
 
 # %% TASEP Theory
 k = 26 * 60  # polymerase elongation rate, bp/min
@@ -40,7 +35,6 @@ tau_rev = 3.4 / 60  # mean abortive initiation duration taken from Tantale2016, 
 tau_rev * 60
 tau_revV = (1 / 60)**2                    # var(tau_rev)
 
-tau_rev_n = 100      # number of data sets in Revyakin2006
 l = 50  # polymerase footprint, bp
 lV = 8**2               # var(l)
 slope_simple_theory = k / (1 + np.sqrt(l))**2   # pol/min
@@ -55,8 +49,6 @@ N_simple_theory = L_min / sqrt(l) / (1 + sqrt(l))
 
 # %% Slope detection
 mins_per_frame = 37 / 60.
-# expected_slope_length_frames = 5
-detect_nc13_leftovers_interval_frames = 10
 min_nc13_length_minutes = 7
 max_nc13_length_minutes = 23
 # slope_length_frames = 6  # 7 frames corresponds to ~4 mins
@@ -122,7 +114,6 @@ intensity_thresholds = {0: 30,
 colors_additivity = {'bac': '#EDB120', 'no_pr': '#D95319',
                      'no_sh': '#68972F', 'sum': '#0072BD', 'abrt_limit': '#000000', 'brown': '#754C29'}
 markers_additivity = ('x', 'o', '^', 'd', '*')
-alpha_additivity = 0.2
 
 # Literature estimates
 Darzacq2007 = {'label': 'Darzacq2007',

@@ -52,8 +52,8 @@ if __name__ == "__main__":
     rho_MC()
     J_over_k_MC()
 
-rho_LD(alpha_over_k_MC)
+    rho_LD(alpha_over_k_MC)
 
-J_over_k_LD(alpha_over_k_MC)
+    J_over_k_LD(alpha_over_k_MC)
 
-3.9e-3 / J_over_k_LD(alpha_over_k_MC)
+    3.9e-3 / J_over_k_LD(alpha_over_k_MC)

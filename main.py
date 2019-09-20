@@ -5,13 +5,13 @@ Make sure  you deactivate the first `try... except...` block if you are launchin
 """
 
 # Allow on-the-fly reloading of the modified project files for iPython-like environments. Disable if you are running in the console
-try:
-    has_run
-except NameError:
-    %matplotlib tk
-    %load_ext autoreload
-    %autoreload 2
-    has_run = 1
+# try:
+#     has_run
+# except NameError:
+#     %matplotlib tk
+#     %load_ext autoreload
+#     %autoreload 2
+#     has_run = 1
 
 
 import copy
@@ -23,21 +23,15 @@ import numpy as np
 import pandas as pd
 from tqdm import trange
 
-from calculate_alpha import calculate_alpha
-from calculate_free_travel_time import calculate_free_travel_time
-from calculate_rho_and_J import calculate_rho_and_J
-from calculate_slopes import calculate_slopes
+# from Dataset import detect_timestep
+from calculate import (calculate_alpha, calculate_free_travel_time,
+                       calculate_rho_and_J, calculate_slopes, filter_by_AP,
+                       identify_ncs, perform_welchs_test)
 from constants import (AP_hist_folder, data_folder, figures_folder,
                        matlab_csv_data_file, output_slopes_folder, s13_hb_bac)
-# from Dataset import detect_timestep
-from filter_by_AP import filter_by_AP
-from identify_ncs import identify_ncs
-from perform_welchs_test import perform_welchs_test
-from plot_j_alpha_curve import plot_j_alpha_curve
-from plot_normalized_current_density_diagram import \
-    plot_normalized_current_density_diagram
-from plot_parameter_evolution import plot_parameter_evolution
-from reinit_folder import reinit_folder
+from plot import (plot_j_alpha_curve, plot_normalized_current_density_diagram,
+                  plot_parameter_evolution)
+from support import reinit_folder
 
 # Do not show figures, just save to files
 matplotlib.use('Agg')

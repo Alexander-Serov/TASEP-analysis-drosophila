@@ -2,16 +2,16 @@
 
 isort:skip_file
 """
-
-try:
-    has_run
-except NameError:
-    %matplotlib tk
-    %load_ext autoreload
-    %autoreload 2
-    has_run = 1
-else:
-    print("Graphic interface NOT re-initialized")
+#
+# try:
+#     has_run
+# except NameError:
+#     %matplotlib tk
+#     %load_ext autoreload
+#     %autoreload 2
+#     has_run = 1
+# else:
+#     print("Graphic interface NOT re-initialized")
 
 import numpy as np
 import os
@@ -55,7 +55,6 @@ def test_composite_estimator():
     np.sqrt(cov_matrix)
 
     d1 = data.T
-    mn = d1.mean(axis=1, keepdims=True)
 
     sum(((d1[:, i, np.newaxis] - true_yield[i]) @
          (d1[:, i, np.newaxis] - true_yield[i]).T for i in range(d1.shape[1]))) / 14

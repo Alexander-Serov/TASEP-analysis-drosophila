@@ -1,6 +1,3 @@
-"""
-Plot changes in j, rho, alpha and tau across ncs for different genes and constructs.
-"""
 
 
 import itertools
@@ -14,6 +11,9 @@ from set_figure_size import set_figure_size
 
 
 def plot_parameter_evolution(analyses, pdf=False):
+    """
+    Plot changes in j, rho, alpha and tau across ncs for different genes and constructs.
+    """
     ncs = np.arange(11, 15)
     genes = set(analyses.gene)
     constructs = set(analyses.construct)
@@ -30,7 +30,6 @@ def plot_parameter_evolution(analyses, pdf=False):
     capsize = 0
     markersize = 4
     lw = 1  # line width
-    p_shift = 0.12
 
     for gene in genes:
         grouped_data = analyses.groupby(by=['gene', 'construct', 'nc'])

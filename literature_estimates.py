@@ -1,19 +1,12 @@
-try:
-    has_run
-except NameError:
-    %matplotlib tk
-    %load_ext autoreload
-    %autoreload 2
-    has_run = 1
-else:
-    print("Graphic interface NOT re-initialized")
+"""
+This file contains scripts with  parameter estimates from earlier publications: Darzacq2007, Tantale2016
+"""
 
 
 import numpy as np
-from scipy.special import erf, gammaln
+from scipy.special import gammaln
 
 from BLUE_estimator import BLUE_estimator
-from constants import k as k_Bothma
 
 # % Common constants
 l = 50
@@ -160,7 +153,7 @@ alpha_over_k_J, alpha_over_k_JV = alpha_over_k_J_func(JoK, JoKV, l, lV)
 print('alpha_over_k_J', [alpha_over_k_J, np.sqrt(alpha_over_k_JV)])
 
 # Get a blue estimator for alpha_over_k
-alpha_over_k, alpha_over_kV, kappa = BLUE_estimator(
+alpha_over_k, alpha_over_kV, _ = BLUE_estimator(
     alpha_over_k_rho, alpha_over_k_rhoV, alpha_over_k_J, alpha_over_k_JV)
 Darzacq2007['alpha_over_k'] = alpha_over_k
 Darzacq2007['alpha_over_kV'] = alpha_over_kV
@@ -175,7 +168,7 @@ tau_JV = tau_J**2 * (kV / k**2 + alpha_over_k_JV / alpha_over_k_J**2)
 print('tau_J', [tau_J, np.sqrt(tau_JV)])
 
 # Get a blue estimator for tau
-tau, tauV, kappa = BLUE_estimator(tau_rho, tau_rhoV, tau_J, tau_JV)
+tau, tauV, _ = BLUE_estimator(tau_rho, tau_rhoV, tau_J, tau_JV)
 Darzacq2007['tau'] = tau
 print('tau', [tau, np.sqrt(tauV)])
 
@@ -188,21 +181,8 @@ ktau_J = 1 / alpha_over_k_J
 ktau_JV = ktau_J**2 * (alpha_over_k_JV / alpha_over_k_J**2)
 print('ktau_J', [ktau_J, np.sqrt(ktau_JV)])
 
-ktau, ktauV, kappa = BLUE_estimator(ktau_rho, ktau_rhoV, ktau_J, ktau_JV)
+ktau, ktauV, _ = BLUE_estimator(ktau_rho, ktau_rhoV, ktau_J, ktau_JV)
 Darzacq2007['ktau'] = ktau
 print('ktau', [ktau, np.sqrt(ktauV)])
 print(Darzacq2007)
 Darzacq2007
-
-
-# %% non-related
-n = 3.5e5
-ln_ptie = - gammaln(n / 2 + 1) * 2 + gammaln(n + 1) - (n - 1) * np.log(2)
-np.exp(ln_ptie)
-lg_ptie = ln_ptie / np.log(10)
-p_tieall = 1 - (1 - np.exp(ln_ptie)) ** 435
-20597 / 435 * 2
-
-# %%
-# k is in bp/min
-1 / (0.03 * k_Bothma) * 60

@@ -1,24 +1,25 @@
-"""
-This file contains the code used for filtering fluorescence traces by their AP positions
-
-For hb, we find the AP corresponding to maximum expression APmax, and then take all traces in the interval [0.05; APmax - 0.05].
-
-For kn, the expressing AP region moves with time. So instead of doing filtering over the whole trace altogether, we do frame by frame filtering. We do not need the connectivity of the traces, because they are anyway averaged out in a single trace for each data set.
-The kn expressing region is rather small, so the filtering works by finding the median AP (mAP) of all expressing nuclei for each individual frame and then keeping only traces withing mAP +- 0.02.
-
-For sn, no filtering is performed.
-"""
 
 
 import pandas as pd
 from tqdm import tqdm
 
-# Constants
-knirps_half_width_AP = 0.02
-hb_AP_margin = 0.05
-
 
 def filter_by_AP(data_in):
+    """
+    This function contains the code used for filtering fluorescence traces by their AP positions
+
+    For hb, we find the AP corresponding to maximum expression APmax, and then take all traces in the interval [0.05; APmax - 0.05].
+
+    For kn, the expressing AP region moves with time. So instead of doing filtering over the whole trace altogether, we do frame by frame filtering. We do not need the connectivity of the traces, because they are anyway averaged out in a single trace for each data set.
+    The kn expressing region is rather small, so the filtering works by finding the median AP (mAP) of all expressing nuclei for each individual frame and then keeping only traces withing mAP +- 0.02.
+
+    For sn, no filtering is performed.
+    """
+
+    # Constants
+    knirps_half_width_AP = 0.02
+    hb_AP_margin = 0.05
+
     datasets = set(data_in.dataset)
     data = pd.DataFrame()
 

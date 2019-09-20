@@ -41,7 +41,7 @@ If a data set needs individual adjustments to the threshold, they must be put in
 
 The ncs are then numbered. By default, it is assumed that the last observed nc is nc14.
 In some data sets, not all of the ncs have been recorded, or artefact ncs may be created by thresholding.
-To correct for this problem, one may manually specify the number of the last nc in the data set by adding it into the `last_ncs` dictionary in `identify_ncs.py`.
+To correct for this problem, one may manually specify the number of the last nc in the data set by adding it into the `last_ncs` dictionary in `identify_ncs` function in `calculate.py`.
 
 ### Initial slope fitting
 
