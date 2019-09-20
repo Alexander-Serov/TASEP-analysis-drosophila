@@ -1,6 +1,7 @@
 import itertools
 import os
 
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import pyplot as plt
@@ -9,6 +10,8 @@ from constants import (LV, Darzacq2007, L, Tantale2016, colors_additivity,
                        figures_folder, gene_long, l, markers_additivity)
 from support import (J_over_k_HD, J_over_k_LD, alpha_over_k_abortive,
                      alpha_over_k_MC, rho_HD, rho_LD, set_figure_size)
+
+matplotlib.use('Agg')
 
 # Constants
 alpha_over_k_min = 0
